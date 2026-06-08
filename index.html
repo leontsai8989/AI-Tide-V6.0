@@ -4284,6 +4284,17 @@
                         stock.transactions = [];
                     }
 
+                    // 如果是舊資料或尚未有交易紀錄但有庫存，先補上一筆初始交易作為基準
+                    if (stock.transactions.length === 0 && stock.shares > 0) {
+                        stock.transactions.push({
+                            type: 'BUY',
+                            date: DateTime.now().toFormat('yyyy-MM-dd'),
+                            shares: stock.shares,
+                            price: stock.avgPrice || 0,
+                            syncCash: false
+                        });
+                    }
+
                     if (!isBuy && this.tradeModal.shares > (stock.shares || 0)) {
                         alert('賣出股數大於目前庫存股數！');
                         return;
