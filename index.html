@@ -2015,99 +2015,45 @@
                                                 <h3 class="text-sm font-black text-slate-800 tracking-wide">GitHub
                                                     雲端跨裝置同步</h3>
                                             </div>
-                                            <p class="text-[10px] text-slate-500 font-bold mb-5 leading-relaxed">透過
-                                                GitHub Gist
-                                                作為您的免費私人資料庫，實現手機與電腦端的無縫對帳。</p>
+                                            <p class="text-[10px] text-slate-500 font-bold mb-5 leading-relaxed">
+                                                登入 Google 帳號，您的資料將即時安全備份至 Firebase 雲端。
+                                            </p>
 
-                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                                                <div>
-                                                    <label
-                                                        class="text-[9px] font-black text-slate-400 mb-1 block uppercase tracking-widest">Personal
-                                                        Access Token (PAT)</label>
-                                                    <div class="relative">
-                                                        <input v-model="githubToken"
-                                                            :type="showGithubToken ? 'text' : 'password'"
-                                                            class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-mono font-bold text-slate-800 outline-none focus:border-indigo-400 focus:bg-white transition-all pr-10"
-                                                            placeholder="ghp_xxxxxxxxxxxx">
-                                                        <button @click="showGithubToken = !showGithubToken"
-                                                            class="absolute right-2 top-2 text-slate-400 hover:text-indigo-500">
-                                                            <i class="fa-solid"
-                                                                :class="showGithubToken ? 'fa-eye-slash' : 'fa-eye'"></i>
+                                            <div v-if="isFirebaseLoading" class="text-center py-6 text-slate-400 font-bold text-xs flex-1 flex flex-col items-center justify-center">
+                                                <i class="fa-solid fa-spinner fa-spin mr-2 mb-2 text-2xl"></i>
+                                                <span>載入狀態中...</span>
+                                            </div>
+                                            <div v-else class="flex-1 flex flex-col">
+                                                <div v-if="!firebaseUser" class="flex-1 flex items-center justify-center">
+                                                    <button @click="signInWithGoogle"
+                                                        class="bg-white border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 px-6 py-4 rounded-xl font-black text-sm flex items-center gap-3 transition-all shadow-sm w-full justify-center">
+                                                        <i class="fa-brands fa-google text-rose-500 text-lg"></i>
+                                                        使用 Google 帳號登入
+                                                    </button>
+                                                </div>
+                                                <div v-else class="flex-1 flex flex-col justify-between">
+                                                    <div class="mb-4 text-xs font-black text-emerald-600 bg-emerald-50 p-4 rounded-xl border border-emerald-100 flex items-center justify-center gap-2">
+                                                        <i class="fa-solid fa-circle-check text-lg"></i> 
+                                                        <span>已登入：{{ firebaseUser.displayName || firebaseUser.email }}</span>
+                                                    </div>
+                                                    <div v-if="syncStatus"
+                                                        class="text-center text-xs font-black mb-4"
+                                                        :class="syncStatus.includes('成功') || syncStatus.includes('完成') ? 'text-emerald-500' : 'text-indigo-500'">
+                                                        {{ syncStatus }}
+                                                    </div>
+                                                    <div class="grid grid-cols-2 gap-4 mt-auto">
+                                                        <button @click="forceSyncToFirebase"
+                                                            class="bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-xl text-xs font-black transition-all shadow-sm flex flex-col items-center justify-center gap-2 h-full">
+                                                            <i class="fa-solid fa-cloud-arrow-up text-xl"></i> 
+                                                            <span>強制備份至雲端</span>
+                                                        </button>
+                                                        <button @click="signOutFirebase"
+                                                            class="bg-white border-2 border-slate-200 hover:bg-slate-50 text-slate-600 p-4 rounded-xl text-xs font-black transition-all shadow-sm flex flex-col items-center justify-center gap-2 h-full">
+                                                            <i class="fa-solid fa-arrow-right-from-bracket text-xl text-rose-500"></i> 
+                                                            <span>登出帳號</span>
                                                         </button>
                                                     </div>
-                                                    <a href="https://github.com/settings/tokens" target="_blank"
-                                                        class="text-[9px] font-black text-indigo-500 hover:text-indigo-600 mt-1.5 inline-block underline decoration-indigo-200 underline-offset-2">點此申請
-                                                        (需勾選 gist 權限)</a>
                                                 </div>
-                                                <div>
-                                                    <label
-                                                        class="text-[9px] font-black text-slate-400 mb-1 block uppercase tracking-widest">Gist
-                                                        ID (首次上傳請留空)</label>
-                                                    <input v-model="gistId" type="text"
-                                                        class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-mono font-bold text-slate-800 outline-none focus:border-indigo-400 focus:bg-white transition-all"
-                                                        placeholder="由系統自動生成...">
-                                                </div>
-                                            </div>
-
-                                            <div
-                                                class="flex items-center justify-between pb-5 mb-5 border-b border-slate-100">
-                                                <span class="text-[10px] font-black text-indigo-500">{{ syncStatus &&
-                                                    syncStatus.includes('設定') ? syncStatus : '' }}</span>
-                                                <button @click="saveGithubSettings"
-                                                    class="bg-slate-100 text-slate-600 border border-slate-200 px-4 py-1.5 rounded-lg text-xs font-black hover:bg-slate-200 transition-colors shadow-sm">記憶本機授權</button>
-                                            </div>
-
-                                            <div v-if="syncStatus && !syncStatus.includes('設定')"
-                                                class="text-center text-xs font-black mb-3"
-                                                :class="syncStatus.includes('成功') ? 'text-emerald-500' : 'text-rose-500'">
-                                                執行狀態: {{ syncStatus }}
-                                            </div>
-
-                                            <div class="grid grid-cols-2 gap-4 mt-auto">
-                                                <button @click="uploadToGist"
-                                                    class="relative group bg-slate-900 border border-slate-800 hover:bg-indigo-600 hover:border-indigo-500 text-white p-4 rounded-xl transition-all shadow-md overflow-hidden flex flex-col items-center justify-center min-h-[100px]">
-                                                    <div class="flex flex-col items-center gap-1.5 z-10 transition-opacity"
-                                                        :class="{'opacity-0': isSyncing && syncStatus.includes('上傳')}">
-                                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                                            class="w-6 h-6 group-hover:-translate-y-1 transition-transform"
-                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                                            stroke-width="2">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                                        </svg>
-                                                        <span
-                                                            class="text-xs font-black tracking-widest uppercase">上傳並覆蓋雲端</span>
-                                                    </div>
-                                                    <div v-if="isSyncing && syncStatus.includes('上傳')"
-                                                        class="absolute inset-0 flex flex-col items-center justify-center z-20 bg-indigo-600">
-                                                        <span class="text-2xl animate-spin mb-1">↻</span>
-                                                        <span
-                                                            class="text-[9px] font-black tracking-widest uppercase">UPLOADING...</span>
-                                                    </div>
-                                                </button>
-
-                                                <button @click="downloadFromGist"
-                                                    class="relative group bg-white border-2 border-indigo-100 hover:bg-indigo-50 hover:border-indigo-300 text-indigo-600 p-4 rounded-xl transition-all shadow-sm flex flex-col items-center justify-center min-h-[100px] overflow-hidden">
-                                                    <div class="flex flex-col items-center gap-1.5 z-10 transition-opacity"
-                                                        :class="{'opacity-0': isSyncing && syncStatus.includes('下載')}">
-                                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                                            class="w-6 h-6 group-hover:translate-y-1 transition-transform"
-                                                            fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                                            stroke-width="2">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                                        </svg>
-                                                        <span
-                                                            class="text-xs font-black tracking-widest uppercase">從雲端下載還原</span>
-                                                    </div>
-                                                    <div v-if="isSyncing && syncStatus.includes('下載')"
-                                                        class="absolute inset-0 flex flex-col items-center justify-center z-20 bg-indigo-50">
-                                                        <span
-                                                            class="text-2xl animate-spin text-indigo-500 mb-1">↻</span>
-                                                        <span
-                                                            class="text-[9px] font-black tracking-widest uppercase text-indigo-600">DOWNLOADING...</span>
-                                                    </div>
-                                                </button>
                                             </div>
 
                                         </div>
@@ -2679,6 +2625,31 @@
 
                     </div>
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC3_7-w5hVlElYDPMj9IQyA4NBizlFVtJE",
+            authDomain: "stock-7767b.firebaseapp.com",
+            projectId: "stock-7767b",
+            storageBucket: "stock-7767b.firebasestorage.app",
+            messagingSenderId: "626541563275",
+            appId: "1:626541563275:web:87bfade6bb59bafcaef38e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
+
+        window.firebaseApp = {
+            auth, db, provider,
+            signInWithPopup, signOut, onAuthStateChanged,
+            doc, setDoc, getDoc
+        };
+    </script>
     <script>
         const { createApp } = Vue;
         const DateTime = luxon.DateTime;
@@ -2778,6 +2749,8 @@
                     vixLoading: false,
                     marketDataLoading: false,
                     requestCache: {},
+                    firebaseUser: null,
+                    isFirebaseLoading: true,
                     executedTargets: [],
                     token: safeApiToken || 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyNi0wMi0xMCAwOTo1NzoxMCIsInVzZXJfaWQiOiJsZW9udHNhaTg5ODkiLCJlbWFpbCI6InRvYnl0c2FpODkyNkBnbWFpbC5jb20iLCJpcCI6IjIxMC41OS4xNjUuMTYzIn0.ozgIhgvZFyTwW-Y4GoWsdhwmuLguhA0IzHth-XKX1YE',
                     apiStatusMsg: '',
@@ -4107,7 +4080,7 @@
                 },
 
                 // =============== [Local Storage Helpers] ===============
-                saveData() {
+                saveDataToLocal() {
                     localStorage.setItem('f_data', JSON.stringify(this.stocks));
                     localStorage.setItem('f_cash', this.cash);
                     localStorage.setItem('f_deps', JSON.stringify(this.depositLogs));
@@ -4120,6 +4093,13 @@
                     }));
                     localStorage.setItem('f_manual_bias', this.manualBias);
                     localStorage.setItem('f_usdtwd_rate', this.usdtwdRate);
+                },
+
+                saveData() {
+                    this.saveDataToLocal();
+                    if (this.firebaseUser && window.firebaseApp) {
+                        this.saveDataToFirebase();
+                    }
                 },
 
                 saveReconcileData() {
@@ -4428,99 +4408,84 @@
                     setTimeout(() => this.apiStatusMsg = '', 2000);
                 },
 
-                saveGithubSettings() {
-                    localStorage.setItem('f_gh_token', this.githubToken);
-                    localStorage.setItem('f_gist_id', this.gistId);
-                    this.syncStatus = '設定已儲存';
-                    setTimeout(() => this.syncStatus = '', 2000);
+                async signInWithGoogle() {
+                    if (!window.firebaseApp) return alert('Firebase 尚未初始化');
+                    try {
+                        await window.firebaseApp.signInWithPopup(window.firebaseApp.auth, window.firebaseApp.provider);
+                    } catch (e) {
+                        console.error(e);
+                        alert('登入失敗: ' + e.message);
+                    }
                 },
 
-                async uploadToGist() {
-                    if (!this.githubToken) return alert('請先輸入 GitHub Token');
-                    this.isSyncing = true;
-                    this.syncStatus = '上傳中...';
-
-                    const content = {
-                        stocks: this.stocks,
-                        depositLogs: this.depositLogs,
-                        cash: this.cash,
-                        reconcile: this.reconcileForm,
-                        updatedAt: new Date().toISOString()
-                    };
-
-                    const payload = {
-                        description: "AI Portfolio Master Backup",
-                        public: false,
-                        files: { "portfolio_data.json": { content: JSON.stringify(content, null, 2) } }
-                    };
-
+                async signOutFirebase() {
+                    if (!window.firebaseApp) return;
                     try {
-                        let url = 'https://api.github.com/gists';
-                        let method = 'POST';
-                        if (this.gistId) {
-                            url += `/${this.gistId}`;
-                            method = 'PATCH';
-                        }
+                        await window.firebaseApp.signOut(window.firebaseApp.auth);
+                        this.firebaseUser = null;
+                        alert('已登出');
+                    } catch (e) {
+                        console.error(e);
+                    }
+                },
 
-                        const res = await fetch(url, {
-                            method: method,
-                            headers: {
-                                'Authorization': `token ${this.githubToken}`,
-                                'Content-Type': 'application/json'
+                async loadDataFromFirebase() {
+                    if (!this.firebaseUser || !window.firebaseApp) return;
+                    try {
+                        const docRef = window.firebaseApp.doc(window.firebaseApp.db, 'users', this.firebaseUser.uid);
+                        const docSnap = await window.firebaseApp.getDoc(docRef);
+                        if (docSnap.exists()) {
+                            const data = docSnap.data();
+                            if (data.stocks) this.stocks = data.stocks;
+                            if (data.depositLogs) this.depositLogs = data.depositLogs;
+                            if (data.cash !== undefined) this.cash = data.cash;
+                            if (data.reconcileForm) this.reconcileForm = data.reconcileForm;
+                            if (data.indices) this.indices = Object.assign(this.indices, data.indices);
+                            if (data.manualBias !== undefined) this.manualBias = data.manualBias;
+                            if (data.usdtwdRate) this.usdtwdRate = data.usdtwdRate;
+                            
+                            this.saveDataToLocal();
+                            console.log("已從 Firebase 載入最新資料");
+                        } else {
+                            console.log("Firebase 尚無資料，將本機資料上傳...");
+                            this.saveDataToFirebase();
+                        }
+                    } catch (e) {
+                        console.error("載入 Firebase 資料失敗:", e);
+                    }
+                },
+
+                async saveDataToFirebase() {
+                    if (!this.firebaseUser || !window.firebaseApp) return;
+                    try {
+                        const docRef = window.firebaseApp.doc(window.firebaseApp.db, 'users', this.firebaseUser.uid);
+                        await window.firebaseApp.setDoc(docRef, {
+                            stocks: this.stocks,
+                            depositLogs: this.depositLogs,
+                            cash: this.cash,
+                            reconcileForm: this.reconcileForm,
+                            indices: {
+                                cnn: this.indices.cnn,
+                                twFear: this.indices.twFear,
+                                yieldCurve: this.indices.yieldCurve,
+                                yieldCurve3M: this.indices.yieldCurve3M,
+                                realRate: this.indices.realRate
                             },
-                            body: JSON.stringify(payload)
+                            manualBias: this.manualBias,
+                            usdtwdRate: this.usdtwdRate,
+                            updatedAt: DateTime.now().toISO()
                         });
-
-                        if (res.ok) {
-                            const data = await res.json();
-                            this.gistId = data.id;
-                            this.saveGithubSettings();
-                            this.syncStatus = '上傳成功';
-                        } else {
-                            throw new Error('Upload failed');
-                        }
+                        this.syncStatus = '雲端同步完成';
+                        setTimeout(() => this.syncStatus = '', 2000);
                     } catch (e) {
-                        alert('上傳失敗，請檢查 Token 權限');
-                        this.syncStatus = '失敗';
-                    } finally {
-                        this.isSyncing = false;
-                        setTimeout(() => this.syncStatus = '', 3000);
+                        console.error("寫入 Firebase 失敗:", e);
+                        this.syncStatus = '同步失敗';
                     }
                 },
 
-                async downloadFromGist() {
-                    if (!this.githubToken || !this.gistId) return alert('請輸入 Token 與 Gist ID');
-                    this.isSyncing = true;
-                    this.syncStatus = '下載中...';
-
-                    try {
-                        const res = await fetch(`https://api.github.com/gists/${this.gistId}`, {
-                            headers: { 'Authorization': `token ${this.githubToken}` }
-                        });
-
-                        if (res.ok) {
-                            const data = await res.json();
-                            const fileContent = data.files['portfolio_data.json'].content;
-                            const parsed = JSON.parse(fileContent);
-
-                            if (confirm(`找到備份 (時間: ${parsed.updatedAt})\n確定要覆蓋當前資料嗎？`)) {
-                                this.stocks = parsed.stocks || [];
-                                this.depositLogs = parsed.depositLogs || [];
-                                this.cash = parsed.cash || 0;
-                                this.reconcileForm = parsed.reconcile || { securitiesCost: 0, bankCash: 0 };
-                                this.saveData();
-                                this.syncStatus = '還原成功';
-                            }
-                        } else {
-                            throw new Error('Download failed');
-                        }
-                    } catch (e) {
-                        alert('下載失敗，請檢查 ID 是否正確');
-                        this.syncStatus = '失敗';
-                    } finally {
-                        this.isSyncing = false;
-                        setTimeout(() => this.syncStatus = '', 3000);
-                    }
+                async forceSyncToFirebase() {
+                    this.syncStatus = '強制上傳中...';
+                    await this.saveDataToFirebase();
                 },
 
                 clearLogs() {
@@ -4546,8 +4511,22 @@
                 }
             },
             mounted() {
-                this.refreshMarketData();
-                this.stocks.forEach(s => this.fetchStockInfo(s));
+                if (window.firebaseApp) {
+                    window.firebaseApp.onAuthStateChanged(window.firebaseApp.auth, async (user) => {
+                        this.firebaseUser = user;
+                        if (user) {
+                            await this.loadDataFromFirebase();
+                        }
+                        this.isFirebaseLoading = false;
+                        
+                        this.refreshMarketData();
+                        this.stocks.forEach(s => this.fetchStockInfo(s));
+                    });
+                } else {
+                    this.isFirebaseLoading = false;
+                    this.refreshMarketData();
+                    this.stocks.forEach(s => this.fetchStockInfo(s));
+                }
 
                 setInterval(() => {
                     this.refreshMarketData();
