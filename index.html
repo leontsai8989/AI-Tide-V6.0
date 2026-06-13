@@ -2452,6 +2452,16 @@
 
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-slate-600 font-bold leading-relaxed">
                                             <div class="flex flex-col gap-4">
+                                                <div>
+                                                    <h4 class="text-xs font-black text-slate-800 mb-1 flex items-center gap-1.5">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-slate-800"></span> 絕對隱私 (Serverless 架構)
+                                                    </h4>
+                                                    <p class="text-xs text-slate-500 font-bold leading-relaxed">
+                                                        本系統採無伺服器架構，您所有的資產數據、股票代號與資金紀錄，都<strong>僅存在您當前設備的 LocalStorage 瀏覽器中</strong>，任何第三方(包括開發者)皆無法取得您的資料，保證絕對隱私。
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-col gap-4">
                                                 <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl mb-6">
                                                     <h4 class="text-xs font-black text-indigo-800 mb-2">
                                                         ⚠️ 強烈建議：登入 Firebase 雲端備份
@@ -2740,10 +2750,7 @@
                     executedTargets: [],
                     token: safeApiToken || 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyNi0wMi0xMCAwOTo1NzoxMCIsInVzZXJfaWQiOiJsZW9udHNhaTg5ODkiLCJlbWFpbCI6InRvYnl0c2FpODkyNkBnbWFpbC5jb20iLCJpcCI6IjIxMC41OS4xNjUuMTYzIn0.ozgIhgvZFyTwW-Y4GoWsdhwmuLguhA0IzHth-XKX1YE',
                     apiStatusMsg: '',
-                    githubToken: safeGhToken,
-                    gistId: safeGistId,
                     showApiToken: false,
-                    showGithubToken: false,
                     privacyMode: false,
                     isSyncing: false,
                     syncStatus: '',
