@@ -2012,7 +2012,7 @@
                                         <div class="pl-2 flex-1 flex flex-col">
                                             <div class="flex items-center gap-2 mb-1">
                                                 <span class="text-sm">☁️</span>
-                                                <h3 class="text-sm font-black text-slate-800 tracking-wide">GitHub
+                                                <h3 class="text-sm font-black text-slate-800 tracking-wide">Firebase
                                                     雲端跨裝置同步</h3>
                                             </div>
                                             <p class="text-[10px] text-slate-500 font-bold mb-5 leading-relaxed">
@@ -2452,13 +2452,15 @@
 
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-slate-600 font-bold leading-relaxed">
                                             <div class="flex flex-col gap-4">
-                                                <div>
-                                                    <h4 class="text-xs font-black text-slate-800 mb-1 flex items-center gap-1.5">
-                                                        <span class="w-1.5 h-1.5 rounded-full bg-slate-800"></span> 絕對隱私 (Serverless 架構)
+                                                <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl mb-6">
+                                                    <h4 class="text-xs font-black text-indigo-800 mb-2">
+                                                        ⚠️ 強烈建議：登入 Firebase 雲端備份
                                                     </h4>
-                                                    <p class="text-xs text-slate-500 font-bold leading-relaxed">
-                                                        本系統採無伺服器架構，您所有的資產數據、股票代號與資金紀錄，都<strong>僅存在您當前設備的 LocalStorage 瀏覽器中</strong>，任何第三方(包括開發者)皆無法取得您的資料，保證絕對隱私。
-                                                    </p>
+                                                    <ul class="text-[10px] text-indigo-700 space-y-1.5 list-disc pl-4 font-bold leading-relaxed">
+                                                        <li>使用 Google 帳號登入系統，所有資料都會自動綁定您的帳號並備份。</li>
+                                                        <li>登入後即可實現跨裝置 (手機/電腦) 的資料無縫同步！</li>
+                                                        <li>系統依然會在本機保留一份快取，讓您即使在離線狀態下也能查看基本資料。</li>
+                                                    </ul>
                                                 </div>
                                                 <div>
                                                     <h4 class="text-xs font-black text-slate-800 mb-1 flex items-center gap-1.5">
@@ -2468,20 +2470,6 @@
                                                         為解決 Yahoo API 常無法穩定取得台股中文名稱的問題，請至 <a href="https://finmind.github.io/" target="_blank" class="text-indigo-500 underline hover:text-indigo-600">FinMind 官網</a> 免費註冊並獲取 Token，貼入左側設定中即可啟用穩定名稱抓取。
                                                     </p>
                                                 </div>
-                                            </div>
-                                            <div class="bg-rose-50/50 p-4 rounded-xl border border-rose-100 flex flex-col gap-2">
-                                                <h4 class="text-xs font-black text-rose-600 flex items-center gap-1.5">
-                                                    ⚠️ 強烈建議：定期 GitHub 雲端備份
-                                                </h4>
-                                                <p class="text-xs text-rose-900 leading-normal font-bold">
-                                                    由於資料僅留於本地設備，若您<strong>清除瀏覽器快取、使用無痕模式或更換手機/電腦</strong>，資料將會遺失。請務必透過 Gist 同步資料：
-                                                </p>
-                                                <ol class="list-decimal pl-4 space-y-1 text-xs text-slate-600 font-bold">
-                                                    <li>前往 GitHub 申請 Personal Access Token (PAT)，並確保勾選 <code class="bg-slate-200 px-1 rounded text-[10px]">gist</code> 權限。</li>
-                                                    <li>將 Token 貼入左側的 GitHub Token 輸入欄位，並點擊「儲存金鑰」。</li>
-                                                    <li>在備份頁面中，點擊 <span class="bg-indigo-600 text-white px-1.5 py-0.5 rounded text-[10px]">Upload</span> 一鍵上傳備份。系統會自動產生一組 Gist ID。</li>
-                                                    <li>在其他裝置中填入相同的 Token 與該 Gist ID，點擊 <span class="bg-white border border-slate-200 text-indigo-600 px-1.5 py-0.5 rounded text-[10px]">Download</span> 即可完美同步還原。</li>
-                                                </ol>
                                             </div>
                                         </div>
                                     </div>
@@ -2658,7 +2646,7 @@
             data() {
                 // =============== [Data Initialization] ===============
                 let safeStocks = [], safeLogs = [], safeCash = 0, safeReconcile = { securitiesCost: 0, bankCash: 0 };
-                let safeGhToken = '', safeGistId = '', safeApiToken = '';
+                let safeApiToken = '';
                 let safeLastView = 'dashboard';
                 let safeUsdtwdRate = 32.5;
 
@@ -2666,8 +2654,6 @@
                 try { safeLogs = JSON.parse(localStorage.getItem('f_deps')) || []; } catch (e) { }
                 try { safeCash = Number(localStorage.getItem('f_cash')) || 0; } catch (e) { }
                 try { safeReconcile = JSON.parse(localStorage.getItem('f_reconcile')) || { securitiesCost: 0, bankCash: 0 }; } catch (e) { }
-                try { safeGhToken = localStorage.getItem('f_gh_token') || ''; } catch (e) { }
-                try { safeGistId = localStorage.getItem('f_gist_id') || ''; } catch (e) { }
                 try { safeApiToken = localStorage.getItem('f_api_token') || ''; } catch (e) { }
                 try { safeUsdtwdRate = Number(localStorage.getItem('f_usdtwd_rate')) || 32.5; } catch (e) { }
                 try {
@@ -2824,7 +2810,7 @@
                         {
                             id: 11,
                             title: '系統操作：我的資料存在哪裡？會不見嗎？',
-                            answer: '🔒 **無伺服器架構 (Local Storage)**<br><br>為了 100% 保障您的財務隱私，系統**沒有**後台資料庫，所有數據都僅存在您當下使用的瀏覽器快取中。<br><br>⚠️ **非常重要：**<br>如果您清除瀏覽器資料或使用無痕模式，資料就會消失！請務必到「系統備份」綁定 GitHub Token，養成定期點擊 [上傳並覆蓋雲端] 的好習慣，就能在手機和電腦間無縫同步。'
+                            answer: '🔒 **本地快取與雲端同步 (Firebase)**<br><br>為了提供最流暢的使用體驗，系統會在您的瀏覽器保留一份本地快取資料。<br><br>⚠️ **非常重要：**<br>請務必到「系統備份」**使用 Google 帳號登入**！登入後您的資料會自動即時安全備份至 Firebase 雲端。只要在不同裝置登入相同的帳號，就能實現手機和電腦間的無縫同步。'
                         }
                     ],
                 }
