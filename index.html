@@ -2625,7 +2625,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAuth, signInWithPopup, signInWithRedirect, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -2644,7 +2644,7 @@
 
         window.firebaseApp = {
             auth, db, provider,
-            signInWithPopup, signOut, onAuthStateChanged,
+            signInWithPopup, signInWithRedirect, signOut, onAuthStateChanged,
             doc, setDoc, getDoc
         };
     </script>
@@ -4404,7 +4404,8 @@
                 async signInWithGoogle() {
                     if (!window.firebaseApp) return alert('Firebase 尚未初始化');
                     try {
-                        await window.firebaseApp.signInWithPopup(window.firebaseApp.auth, window.firebaseApp.provider);
+                        // 改用 Redirect 避免 GitHub Pages 或手機瀏覽器阻擋彈出視窗
+                        await window.firebaseApp.signInWithRedirect(window.firebaseApp.auth, window.firebaseApp.provider);
                     } catch (e) {
                         console.error(e);
                         alert('登入失敗: ' + e.message);
