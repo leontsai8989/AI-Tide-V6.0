@@ -4095,7 +4095,10 @@
                 saveData() {
                     this.saveDataToLocal();
                     if (this.firebaseUser && window.firebaseApp && !this.isFirebaseLoading) {
-                        this.saveDataToFirebase();
+                        if (this._firebaseSaveTimeout) clearTimeout(this._firebaseSaveTimeout);
+                        this._firebaseSaveTimeout = setTimeout(() => {
+                            this.saveDataToFirebase();
+                        }, 2000);
                     }
                 },
 
@@ -4454,6 +4457,9 @@
 
                 async saveDataToFirebase() {
                     if (!this.firebaseUser || !window.firebaseApp) return;
+                    if (!this.syncStatus.includes('強制')) {
+                        this.syncStatus = '同步中...';
+                    }
                     try {
                         const docRef = window.firebaseApp.doc(window.firebaseApp.db, 'users', this.firebaseUser.uid);
                         await window.firebaseApp.setDoc(docRef, {
