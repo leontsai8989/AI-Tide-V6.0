@@ -2041,11 +2041,16 @@
                                                         :class="syncStatus.includes('成功') || syncStatus.includes('完成') ? 'text-emerald-500' : 'text-indigo-500'">
                                                         {{ syncStatus }}
                                                     </div>
-                                                    <div class="grid grid-cols-2 gap-4 mt-auto">
+                                                    <div class="grid grid-cols-3 gap-2 mt-auto">
+                                                        <button @click="forceDownloadFromFirebase"
+                                                            class="bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-xl text-xs font-black transition-all shadow-sm flex flex-col items-center justify-center gap-2 h-full">
+                                                            <i class="fa-solid fa-cloud-arrow-down text-xl"></i> 
+                                                            <span>雲端下載</span>
+                                                        </button>
                                                         <button @click="forceSyncToFirebase"
                                                             class="bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-xl text-xs font-black transition-all shadow-sm flex flex-col items-center justify-center gap-2 h-full">
                                                             <i class="fa-solid fa-cloud-arrow-up text-xl"></i> 
-                                                            <span>強制備份至雲端</span>
+                                                            <span>備份至雲端</span>
                                                         </button>
                                                         <button @click="signOutFirebase"
                                                             class="bg-white border-2 border-slate-200 hover:bg-slate-50 text-slate-600 p-4 rounded-xl text-xs font-black transition-all shadow-sm flex flex-col items-center justify-center gap-2 h-full">
@@ -4089,7 +4094,7 @@
 
                 saveData() {
                     this.saveDataToLocal();
-                    if (this.firebaseUser && window.firebaseApp) {
+                    if (this.firebaseUser && window.firebaseApp && !this.isFirebaseLoading) {
                         this.saveDataToFirebase();
                     }
                 },
@@ -4478,6 +4483,13 @@
                 async forceSyncToFirebase() {
                     this.syncStatus = '強制上傳中...';
                     await this.saveDataToFirebase();
+                },
+
+                async forceDownloadFromFirebase() {
+                    this.syncStatus = '強制下載中...';
+                    await this.loadDataFromFirebase();
+                    this.syncStatus = '雲端下載完成';
+                    setTimeout(() => this.syncStatus = '', 2000);
                 },
 
                 clearLogs() {
