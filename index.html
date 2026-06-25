@@ -2647,8 +2647,7 @@
             signInWithPopup, signInWithRedirect, signOut, onAuthStateChanged,
             doc, setDoc, getDoc
         };
-    </script>
-    <script>
+
         const { createApp } = Vue;
         const DateTime = luxon.DateTime;
 
@@ -4404,8 +4403,7 @@
                 async signInWithGoogle() {
                     if (!window.firebaseApp) return alert('Firebase 尚未初始化');
                     try {
-                        // 改用 Redirect 避免 GitHub Pages 或手機瀏覽器阻擋彈出視窗
-                        await window.firebaseApp.signInWithRedirect(window.firebaseApp.auth, window.firebaseApp.provider);
+                        await window.firebaseApp.signInWithPopup(window.firebaseApp.auth, window.firebaseApp.provider);
                     } catch (e) {
                         console.error(e);
                         alert('登入失敗: ' + e.message);
