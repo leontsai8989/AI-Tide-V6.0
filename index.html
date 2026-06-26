@@ -2631,7 +2631,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithPopup, signInWithRedirect, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC3_7-w5hVlElYDPMj9IQyA4NBizlFVtJE",
@@ -2650,7 +2650,7 @@
         window.firebaseApp = {
             auth, db, provider,
             signInWithPopup, signInWithRedirect, signOut, onAuthStateChanged,
-            doc, setDoc, getDoc
+            doc, setDoc, getDoc, onSnapshot
         };
 
         const { createApp } = Vue;
@@ -4090,9 +4090,11 @@
                     }));
                     localStorage.setItem('f_manual_bias', this.manualBias);
                     localStorage.setItem('f_usdtwd_rate', this.usdtwdRate);
+                    localStorage.setItem('f_updated_at', this.localUpdatedAt || DateTime.now().toISO());
                 },
 
                 saveData() {
+                    this.localUpdatedAt = DateTime.now().toISO();
                     this.saveDataToLocal();
                     if (this.firebaseUser && window.firebaseApp && !this.isFirebaseLoading) {
                         if (this._firebaseSaveTimeout) clearTimeout(this._firebaseSaveTimeout);
@@ -4430,22 +4432,15 @@
                 },
 
                 async loadDataFromFirebase() {
+                    // For manual refresh backward compatibility
                     if (!this.firebaseUser || !window.firebaseApp) return;
+                    this.syncStatus = '強制下載中...';
                     try {
                         const docRef = window.firebaseApp.doc(window.firebaseApp.db, 'users', this.firebaseUser.uid);
                         const docSnap = await window.firebaseApp.getDoc(docRef);
                         if (docSnap.exists()) {
-                            const data = docSnap.data();
-                            if (data.stocks) this.stocks = data.stocks;
-                            if (data.depositLogs) this.depositLogs = data.depositLogs;
-                            if (data.cash !== undefined) this.cash = data.cash;
-                            if (data.reconcileForm) this.reconcileForm = data.reconcileForm;
-                            if (data.indices) this.indices = Object.assign(this.indices, data.indices);
-                            if (data.manualBias !== undefined) this.manualBias = data.manualBias;
-                            if (data.usdtwdRate) this.usdtwdRate = data.usdtwdRate;
-                            
-                            this.saveDataToLocal();
-                            console.log("已從 Firebase 載入最新資料");
+                            this.applyFirebaseData(docSnap.data());
+                            console.log("已手動從 Firebase 載入最新資料");
                         } else {
                             console.log("Firebase 尚無資料，將本機資料上傳...");
                             this.saveDataToFirebase();
@@ -4455,6 +4450,52 @@
                     }
                 },
 
+                setupFirebaseListener() {
+                    if (!this.firebaseUser || !window.firebaseApp) return;
+                    if (this._firebaseUnsubscribe) this._firebaseUnsubscribe();
+                    
+                    const docRef = window.firebaseApp.doc(window.firebaseApp.db, 'users', this.firebaseUser.uid);
+                    this._firebaseUnsubscribe = window.firebaseApp.onSnapshot(docRef, (docSnap) => {
+                        if (docSnap.exists()) {
+                            if (docSnap.metadata.hasPendingWrites) {
+                                // Ignore local writes
+                                return;
+                            }
+                            const data = docSnap.data();
+                            const serverTime = data.updatedAt;
+                            const localTime = localStorage.getItem('f_updated_at');
+                            
+                            if (serverTime && localTime && serverTime < localTime) {
+                                // Local data is newer (e.g. browser was closed before debounce finished)
+                                console.log("發現本地資料較新，覆蓋雲端...");
+                                this.saveDataToFirebase();
+                            } else {
+                                this.applyFirebaseData(data);
+                                console.log("已從 Firebase 自動同步最新資料");
+                            }
+                        } else {
+                            this.saveDataToFirebase();
+                        }
+                    }, (error) => {
+                        console.error("Firebase 即時同步失敗:", error);
+                    });
+                },
+
+                applyFirebaseData(data) {
+                    if (data.stocks) this.stocks = data.stocks;
+                    if (data.depositLogs) this.depositLogs = data.depositLogs;
+                    if (data.cash !== undefined) this.cash = data.cash;
+                    if (data.reconcileForm) this.reconcileForm = data.reconcileForm;
+                    if (data.indices) this.indices = Object.assign(this.indices, data.indices);
+                    if (data.manualBias !== undefined) this.manualBias = data.manualBias;
+                    if (data.usdtwdRate) this.usdtwdRate = data.usdtwdRate;
+                    if (data.updatedAt) {
+                        this.localUpdatedAt = data.updatedAt;
+                        localStorage.setItem('f_updated_at', data.updatedAt);
+                    }
+                    this.saveDataToLocal();
+                },
+
                 async saveDataToFirebase() {
                     if (!this.firebaseUser || !window.firebaseApp) return;
                     if (!this.syncStatus.includes('強制')) {
@@ -4462,7 +4503,14 @@
                     }
                     try {
                         const docRef = window.firebaseApp.doc(window.firebaseApp.db, 'users', this.firebaseUser.uid);
-                        await window.firebaseApp.setDoc(docRef, {
+                        const now = DateTime.now().toISO();
+                        
+                        // Sync local time before upload to avoid onSnapshot triggering an overwrite
+                        this.localUpdatedAt = now;
+                        localStorage.setItem('f_updated_at', now);
+
+                        // Strip Vue Proxies for lightning-fast Firebase serialization
+                        const plainData = JSON.parse(JSON.stringify({
                             stocks: this.stocks,
                             depositLogs: this.depositLogs,
                             cash: this.cash,
@@ -4476,8 +4524,10 @@
                             },
                             manualBias: this.manualBias,
                             usdtwdRate: this.usdtwdRate,
-                            updatedAt: DateTime.now().toISO()
-                        });
+                            updatedAt: now
+                        }));
+
+                        await window.firebaseApp.setDoc(docRef, plainData);
                         this.syncStatus = '雲端同步完成';
                         setTimeout(() => this.syncStatus = '', 2000);
                     } catch (e) {
@@ -4525,7 +4575,7 @@
                     window.firebaseApp.onAuthStateChanged(window.firebaseApp.auth, async (user) => {
                         this.firebaseUser = user;
                         if (user) {
-                            await this.loadDataFromFirebase();
+                            this.setupFirebaseListener();
                         }
                         this.isFirebaseLoading = false;
                         
