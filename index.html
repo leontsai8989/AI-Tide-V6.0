@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>AI Tide-V5.0</title>
+    <title>AI Tide-V6.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -540,10 +540,11 @@
             class="custom-scrollbar flex-1 w-full pb-8">
             <div class="flex flex-col gap-4 pt-2 px-1">
 
-                <div class="flex justify-between items-end">
-                    <h2 class="text-lg font-black text-slate-800">{{ currentView === 'us_market' ? 'US Market Terminal'
-                        : 'TW Market Terminal' }} <span class="text-xs text-slate-500 font-bold ml-2">{{ currentView ===
-                            'us_market' ? '美股利率與情緒監測' : '台股資金與情緒監測' }}</span></h2>
+                <div class="flex justify-between items-end border-b-2 border-slate-300 pb-2 mb-4 px-1 mx-1">
+                    <div class="flex items-baseline gap-3">
+                        <h2 class="text-xl font-900 text-slate-800 tracking-tight">{{ currentView === 'us_market' ? 'US Market Terminal' : 'TW Market Terminal' }}</h2>
+                        <span class="text-xs font-bold text-slate-500 hidden sm:block">{{ currentView === 'us_market' ? '美股利率與情緒監測' : '台股資金與情緒監測' }}</span>
+                    </div>
                     <button @click="refreshMarketData"
                         class="bg-white border border-slate-300 text-slate-700 px-3 py-1.5 rounded-md font-bold text-xs hover:bg-slate-50 shadow-sm flex items-center gap-1.5">
                         <span :class="{'animate-spin': marketDataLoading}">↻</span> 更新數據
@@ -838,7 +839,7 @@
                                                 </div>
                                                 <div class="text-[11px] font-black px-2.5 py-1 rounded-full"
                                                     :class="(indices.vix || 0) >= 25 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'">
-                                                    {{ (indices.vix || 0) >= 25 ? '😱 恐慌買點' : '😌 安逸過熱' }}
+                                                    {{ (indices.vix || 0) >= 25 ? '恐慌買點' : '安逸過熱' }}
                                                 </div>
                                             </div>
                                             <div class="flex items-baseline gap-1 mb-3">
@@ -903,6 +904,77 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <!-- QQQ 乖離 -->
+                                    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden">
+                                        <div class="absolute top-0 left-0 w-1 h-full rounded-l-2xl bg-indigo-500"></div>
+                                        <div class="pl-3">
+                                            <div class="flex justify-between items-start mb-2">
+                                                <div>
+                                                    <a href="https://finance.yahoo.com/quote/QQQ" target="_blank" class="text-sm font-black text-slate-800 hover:text-indigo-600">納斯達克 (QQQ) · 60MA乖離</a>
+                                                    <div class="text-[11px] text-slate-400 font-bold mt-0.5">美國科技股實體價格動能</div>
+                                                </div>
+                                                <div class="flex items-center gap-1.5">
+                                                    <span class="text-[10px] font-black bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded-full border border-indigo-100">WT: 25%</span>
+                                                    <div class="text-[10px] font-black px-2 py-0.5 rounded-full"
+                                                        :class="parseFloat(indices.qqqBias || 0) >= 10 ? 'bg-rose-100 text-rose-700' : (parseFloat(indices.qqqBias || 0) <= -8 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600')">
+                                                        {{ parseFloat(indices.qqqBias || 0) >= 10 ? '嚴重過熱' : (parseFloat(indices.qqqBias || 0) <= -8 ? '恐慌超跌' : '中性震盪') }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-baseline gap-1 mb-3">
+                                                <input v-model.number="indices.qqqBias" @input="saveData" type="number" step="0.1"
+                                                    class="text-4xl font-black mono w-24 p-0 bg-transparent outline-none focus:border-b-2 focus:border-indigo-400 transition-colors"
+                                                    :class="parseFloat(indices.qqqBias || 0) >= 10 ? 'text-rose-600' : (parseFloat(indices.qqqBias || 0) <= -8 ? 'text-emerald-600' : 'text-amber-500')"
+                                                    placeholder="0.0">
+                                                <span class="text-xs font-bold text-slate-400">%</span>
+                                            </div>
+                                            <div class="relative w-full h-1.5 rounded-full bg-gradient-to-r from-emerald-500 via-amber-400 to-rose-500">
+                                                <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1.5 h-3.5 bg-slate-900 rounded-sm shadow border border-white transition-all duration-500"
+                                                    :style="{ left: Math.min(Math.max(((parseFloat(indices.qqqBias || 0) + 8) / 20) * 100, 0), 100) + '%' }">
+                                                </div>
+                                            </div>
+                                            <div class="flex justify-between text-[10px] font-black text-slate-400 mt-1.5">
+                                                <span class="text-emerald-500">超跌 -8%</span><span class="text-slate-400">0%</span><span class="text-rose-500">過熱 +12%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- DXY 美元指數 -->
+                                    <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden">
+                                        <div class="absolute top-0 left-0 w-1 h-full rounded-l-2xl bg-cyan-500"></div>
+                                        <div class="pl-3">
+                                            <div class="flex justify-between items-start mb-2">
+                                                <div>
+                                                    <a href="https://finance.yahoo.com/quote/DX-Y.NYB" target="_blank" class="text-sm font-black text-slate-800 hover:text-cyan-600">美元指數 (DXY) · 60MA乖離</a>
+                                                    <div class="text-[11px] text-slate-400 font-bold mt-0.5">全球熱錢避險情緒</div>
+                                                </div>
+                                                <div class="flex items-center gap-1.5">
+                                                    <span class="text-[10px] font-black bg-cyan-50 text-cyan-600 px-1.5 py-0.5 rounded-full border border-cyan-100">WT: 20%</span>
+                                                    <div class="text-[10px] font-black px-2 py-0.5 rounded-full"
+                                                        :class="parseFloat(indices.dxyBias || 0) >= 3 ? 'bg-rose-100 text-rose-700' : (parseFloat(indices.dxyBias || 0) <= -3 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600')">
+                                                        {{ parseFloat(indices.dxyBias || 0) >= 3 ? '資金緊縮' : (parseFloat(indices.dxyBias || 0) <= -3 ? '資金寬鬆' : '中性震盪') }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-baseline gap-1 mb-3">
+                                                <input v-model.number="indices.dxyBias" @input="saveData" type="number" step="0.1"
+                                                    class="text-4xl font-black mono w-24 p-0 bg-transparent outline-none focus:border-b-2 focus:border-cyan-400 transition-colors"
+                                                    :class="parseFloat(indices.dxyBias || 0) >= 3 ? 'text-rose-600' : (parseFloat(indices.dxyBias || 0) <= -3 ? 'text-emerald-600' : 'text-amber-500')"
+                                                    placeholder="0.0">
+                                                <span class="text-xs font-bold text-slate-400">%</span>
+                                            </div>
+                                            <div class="relative w-full h-1.5 rounded-full bg-gradient-to-r from-emerald-500 via-amber-400 to-rose-500">
+                                                <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1.5 h-3.5 bg-slate-900 rounded-sm shadow border border-white transition-all duration-500"
+                                                    :style="{ left: Math.min(Math.max(((parseFloat(indices.dxyBias || 0) + 3) / 6) * 100, 0), 100) + '%' }">
+                                                </div>
+                                            </div>
+                                            <div class="flex justify-between text-[10px] font-black text-slate-400 mt-1.5">
+                                                <span class="text-emerald-500">寬鬆 -3%</span><span class="text-slate-400">0%</span><span class="text-rose-500">緊縮 +3%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
 
@@ -1232,9 +1304,15 @@
                                         <div
                                             class="card-wrap flex-1 flex flex-col justify-center p-6 bg-gradient-to-br from-white to-indigo-50/30">
                                             <div class="flex items-center justify-between">
-                                                <span
-                                                    class="text-xs font-black text-indigo-500 uppercase tracking-widest">總資產規模
-                                                    (Total Assets)</span>
+                                                <div class="flex items-center gap-2">
+                                                    <span
+                                                        class="text-xs font-black text-indigo-500 uppercase tracking-widest">總資產規模
+                                                        (Total Assets)</span>
+                                                    <select v-if="traders.length > 1" v-model="currentTrader" class="bg-indigo-50 border border-indigo-200 text-indigo-600 text-[10px] font-black rounded px-1 py-0.5 outline-none cursor-pointer">
+                                                        <option value="所有">所有人</option>
+                                                        <option v-for="t in traders" :value="t">{{ t }}</option>
+                                                    </select>
+                                                </div>
                                                 <button @click="privacyMode = !privacyMode"
                                                     class="text-slate-400 hover:text-indigo-500 transition-colors">
                                                     <i class="fa-solid"
@@ -1242,7 +1320,7 @@
                                                 </button>
                                             </div>
                                             <p class="text-3xl md:text-4xl font-900 mono text-slate-800 mt-2">NT$ {{
-                                                privacyMode ? '******' : (totalMarketValue + cash).toLocaleString() }}
+                                                privacyMode ? '******' : (totalMarketValue + currentCash).toLocaleString() }}
                                             </p>
                                         </div>
                                         <div class="card-wrap flex-1 flex flex-col justify-center p-6"
@@ -1379,12 +1457,16 @@
                                                             <span class="status-dot"
                                                                 :class="item.status === 'error' ? 'status-err' : (item.status === 'loading' ? 'status-warn' : 'status-ok')"></span>{{
                                                             item.name || 'SYNC...' }}
+                                                            <span v-if="item.owner && item.owner !== '本人'" class="ml-2 bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded text-[9px] font-black tracking-wider whitespace-nowrap">{{ item.owner }}</span>
                                                         </span>
                                                     </div>
                                                     <div v-else class="flex flex-col gap-1">
                                                         <input v-model="item.code" @change="resetStockName(item)"
                                                             type="text"
                                                             class="edit-input !text-left !bg-white !border-slate-200 !w-24">
+                                                        <select v-if="traders.length > 1" v-model="item.owner" class="edit-input !text-left !bg-white !border-slate-200 !w-24 text-[10px] text-violet-600">
+                                                            <option v-for="t in traders" :value="t">{{ t }}</option>
+                                                        </select>
                                                     </div>
                                                 </td>
                                                 <td class="text-center">
@@ -1566,9 +1648,14 @@
                                             <tr class="bg-indigo-50/20 border-t border-dashed border-indigo-200">
                                                 <td></td>
                                                 <td class="pl-2 md:pl-4 py-3">
-                                                    <input v-model="form.code" type="text" placeholder="+ 新增代號"
-                                                        class="edit-input !text-left !bg-white/80 !w-24 text-indigo-600 border border-slate-200"
-                                                        @keyup.enter="handleSave">
+                                                    <div class="flex flex-col gap-1">
+                                                        <input v-model="form.code" type="text" placeholder="+ 新增代號"
+                                                            class="edit-input !text-left !bg-white/80 !w-24 text-indigo-600 border border-slate-200"
+                                                            @keyup.enter="handleSave">
+                                                        <select v-if="traders.length > 1" v-model="form.owner" class="edit-input !text-left !bg-white/80 !w-24 text-violet-600 border border-slate-200 text-[10px]">
+                                                            <option v-for="t in traders" :value="t">{{ t }}</option>
+                                                        </select>
+                                                    </div>
                                                 </td>
                                                 <td class="text-center py-3">
                                                     <!-- 成本輸入組 -->
@@ -1646,6 +1733,18 @@
                         <div v-if="currentView === 'deposits'"
                             class="flex-1 flex flex-col animate-in fade-in duration-500 overflow-hidden min-h-0 pt-4 custom-scrollbar">
 
+                            <div class="flex justify-between items-end border-b-2 border-slate-300 pb-2 mb-4 px-1 mx-1">
+                                <div class="flex items-baseline gap-3">
+                                    <h2 class="text-xl font-900 text-slate-800 tracking-tight">Account Overview</h2>
+                                    <span class="text-xs font-bold text-slate-500 hidden sm:block">帳務總覽與進階管理</span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button @click="exportUnifiedCSV()" class="text-[11px] font-black text-slate-500 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors shadow-sm border border-slate-200">📤 匯出 Excel (CSV)</button>
+                                    <button @click="$refs.unifiedFileInput.click()" class="text-[11px] font-black text-slate-500 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors shadow-sm border border-slate-200">📥 匯入 Excel (CSV)</button>
+                                    <input type="file" accept=".csv" ref="unifiedFileInput" class="hidden" @change="importUnifiedCSV">
+                                </div>
+                            </div>
+
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 shrink-0 px-1">
 
                                 <div class="card-wrap bg-white p-5 flex flex-col gap-4">
@@ -1668,8 +1767,13 @@
                                                 }}</span>
                                         </div>
                                         <div class="bg-slate-50 p-2 rounded-xl border border-slate-100 space-y-2">
-                                            <input v-model="quickInput.deposit.date" type="date"
-                                                class="w-full bg-transparent text-xs font-bold text-slate-500 outline-none">
+                                            <div class="flex items-center gap-2">
+                                                <input v-model="quickInput.deposit.date" type="date"
+                                                    class="flex-1 bg-transparent text-xs font-bold text-slate-500 outline-none">
+                                                <select v-if="traders.length > 1" v-model="quickInput.deposit.owner" class="bg-white border border-slate-200 text-xs font-bold text-emerald-600 rounded px-1 outline-none py-0.5">
+                                                    <option v-for="t in traders" :value="t">{{ t }}</option>
+                                                </select>
+                                            </div>
                                             <div class="flex items-center gap-2">
                                                 <input v-model.number="quickInput.deposit.amount" type="number"
                                                     placeholder="金額"
@@ -1703,8 +1807,13 @@
                                                 }}</span>
                                         </div>
                                         <div class="bg-slate-50 p-2 rounded-xl border border-slate-100 space-y-2">
-                                            <input v-model="quickInput.dividend.date" type="date"
-                                                class="w-full bg-transparent text-xs font-bold text-slate-500 outline-none">
+                                            <div class="flex items-center gap-2">
+                                                <input v-model="quickInput.dividend.date" type="date"
+                                                    class="flex-1 bg-transparent text-xs font-bold text-slate-500 outline-none">
+                                                <select v-if="traders.length > 1" v-model="quickInput.dividend.owner" class="bg-white border border-slate-200 text-xs font-bold text-indigo-500 rounded px-1 outline-none py-0.5">
+                                                    <option v-for="t in traders" :value="t">{{ t }}</option>
+                                                </select>
+                                            </div>
                                             <div class="flex items-center gap-2">
                                                 <input v-model.number="quickInput.dividend.amount" type="number"
                                                     placeholder="金額"
@@ -1784,9 +1893,10 @@
                             <div class="flex-1 flex flex-col md:flex-row gap-4 overflow-hidden min-h-0">
 
                                 <div class="flex-1 glass rounded-[2rem] p-6 flex flex-col shadow-sm overflow-hidden">
-                                    <div class="flex items-center gap-3 mb-4">
-                                        <h3 class="font-black text-slate-700 border-l-4 border-emerald-500 pl-3">入金明細
-                                        </h3>
+                                    <div class="flex justify-between items-center mb-4">
+                                        <div class="flex items-center gap-3">
+                                            <h3 class="font-black text-slate-700 border-l-4 border-emerald-500 pl-3">入金明細</h3>
+                                        </div>
                                     </div>
                                     <div class="custom-scrollbar flex-1 pr-2">
                                         <table class="w-full text-left">
@@ -1815,10 +1925,13 @@
                                                     <td class="pl-3 py-2">
                                                         <div v-if="editDepositIndex !== depositLogs.indexOf(log)">
                                                             <div class="flex flex-col">
-                                                                <span v-if="log.type === 'adjustment'"
-                                                                    class="text-[9px] font-black text-slate-500 bg-slate-100 px-1 py-0.5 rounded w-fit mb-0.5">調節</span>
-                                                                <span v-else
-                                                                    class="text-[9px] font-black text-emerald-600 bg-emerald-50 px-1 py-0.5 rounded w-fit mb-0.5">入金</span>
+                                                                <div class="flex gap-1 mb-0.5">
+                                                                    <span v-if="log.type === 'adjustment'"
+                                                                        class="text-[9px] font-black text-slate-500 bg-slate-100 px-1 py-0.5 rounded w-fit">調節</span>
+                                                                    <span v-else
+                                                                        class="text-[9px] font-black text-emerald-600 bg-emerald-50 px-1 py-0.5 rounded w-fit">入金</span>
+                                                                    <span v-if="log.owner && log.owner !== '本人'" class="text-[9px] font-black text-violet-600 bg-violet-50 px-1 py-0.5 rounded w-fit">{{ log.owner }}</span>
+                                                                </div>
                                                                 <span
                                                                     class="text-xs font-bold text-slate-400 whitespace-nowrap">{{
                                                                     log.date }}</span>
@@ -1826,7 +1939,10 @@
                                                         </div>
                                                         <div v-else>
                                                             <input v-model="log.date" type="date"
-                                                                class="bg-white border border-slate-200 rounded text-xs px-2 py-1 w-full outline-none focus:border-emerald-400 font-bold text-slate-600">
+                                                                class="bg-white border border-slate-200 rounded text-xs px-2 py-1 w-full outline-none focus:border-emerald-400 font-bold text-slate-600 mb-1">
+                                                            <select v-if="traders.length > 1" v-model="log.owner" class="bg-white border border-slate-200 rounded text-[10px] px-1 py-0.5 w-full outline-none focus:border-emerald-400 font-bold text-violet-600">
+                                                                <option v-for="t in traders" :value="t">{{ t }}</option>
+                                                            </select>
                                                         </div>
                                                     </td>
 
@@ -1852,7 +1968,7 @@
                                                         <div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
                                                             :class="{'opacity-100': editDepositIndex === depositLogs.indexOf(log)}">
                                                             <button v-if="editDepositIndex !== depositLogs.indexOf(log)"
-                                                                @click="editDepositIndex = depositLogs.indexOf(log)"
+                                                                @click="startEditLog(log)"
                                                                 class="w-6 h-6 rounded flex items-center justify-center bg-slate-100 text-slate-400 hover:bg-white hover:text-emerald-500 hover:shadow-sm transition-all text-xs">✎</button>
                                                             <button v-else @click="saveLog()"
                                                                 class="w-6 h-6 rounded flex items-center justify-center bg-emerald-500 text-white hover:bg-emerald-600 shadow-sm transition-all text-xs">✔</button>
@@ -1868,9 +1984,10 @@
                                 </div>
 
                                 <div class="flex-1 glass rounded-[2rem] p-6 flex flex-col shadow-sm overflow-hidden">
-                                    <div class="flex items-center gap-3 mb-4">
-                                        <h3 class="font-black text-slate-700 border-l-4 border-indigo-500 pl-3">配息明細
-                                        </h3>
+                                    <div class="flex justify-between items-center mb-4">
+                                        <div class="flex items-center gap-3">
+                                            <h3 class="font-black text-slate-700 border-l-4 border-indigo-500 pl-3">配息明細</h3>
+                                        </div>
                                     </div>
                                     <div class="custom-scrollbar flex-1 pr-2">
                                         <table class="w-full text-left">
@@ -1899,8 +2016,10 @@
                                                     <td class="pl-3 py-2">
                                                         <div v-if="editDepositIndex !== depositLogs.indexOf(log)">
                                                             <div class="flex flex-col">
-                                                                <span
-                                                                    class="text-[9px] font-black text-indigo-500 bg-indigo-50 px-1.5 py-0.5 rounded w-fit mb-0.5">配息</span>
+                                                                <div class="flex gap-1 mb-0.5">
+                                                                    <span class="text-[9px] font-black text-indigo-500 bg-indigo-50 px-1.5 py-0.5 rounded w-fit">配息</span>
+                                                                    <span v-if="log.owner && log.owner !== '本人'" class="text-[9px] font-black text-violet-600 bg-violet-50 px-1 py-0.5 rounded w-fit">{{ log.owner }}</span>
+                                                                </div>
                                                                 <span
                                                                     class="text-xs font-bold text-slate-400 whitespace-nowrap">{{
                                                                     log.date }}</span>
@@ -1908,7 +2027,10 @@
                                                         </div>
                                                         <div v-else>
                                                             <input v-model="log.date" type="date"
-                                                                class="bg-white border border-slate-200 rounded text-xs px-2 py-1 w-full outline-none focus:border-indigo-400 font-bold text-slate-600">
+                                                                class="bg-white border border-slate-200 rounded text-xs px-2 py-1 w-full outline-none focus:border-indigo-400 font-bold text-slate-600 mb-1">
+                                                            <select v-if="traders.length > 1" v-model="log.owner" class="bg-white border border-slate-200 rounded text-[10px] px-1 py-0.5 w-full outline-none focus:border-indigo-400 font-bold text-violet-600">
+                                                                <option v-for="t in traders" :value="t">{{ t }}</option>
+                                                            </select>
                                                         </div>
                                                     </td>
 
@@ -1933,7 +2055,7 @@
                                                         <div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
                                                             :class="{'opacity-100': editDepositIndex === depositLogs.indexOf(log)}">
                                                             <button v-if="editDepositIndex !== depositLogs.indexOf(log)"
-                                                                @click="editDepositIndex = depositLogs.indexOf(log)"
+                                                                @click="startEditLog(log)"
                                                                 class="w-6 h-6 rounded flex items-center justify-center bg-slate-100 text-slate-400 hover:bg-white hover:text-indigo-500 hover:shadow-sm transition-all text-xs">✎</button>
                                                             <button v-else @click="saveLog()"
                                                                 class="w-6 h-6 rounded flex items-center justify-center bg-indigo-500 text-white hover:bg-indigo-600 shadow-sm transition-all text-xs">✔</button>
@@ -1957,7 +2079,7 @@
                                     <div class="flex items-baseline gap-3">
                                         <h2 class="text-xl font-900 text-slate-800 tracking-tight">System Settings</h2>
                                         <span
-                                            class="text-[11px] font-bold text-slate-500 hidden sm:block">系統設定與雲端備份</span>
+                                            class="text-xs font-bold text-slate-500 hidden sm:block">系統設定與雲端備份</span>
                                     </div>
                                 </div>
 
@@ -2011,6 +2133,29 @@
                                             </div>
                                         </div>
 
+                                        <div class="bg-white border border-slate-300 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+                                            <div class="absolute top-0 left-0 w-1 h-full bg-violet-500"></div>
+                                            <div class="pl-2">
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <span class="text-sm">👥</span>
+                                                    <h3 class="text-sm font-black text-slate-800 tracking-wide">子帳戶 (交易者) 管理</h3>
+                                                </div>
+                                                <p class="text-[10px] text-slate-500 font-bold mb-4">
+                                                    新增帳戶以分開計算資產與損益。股票與現金都會獨立記帳。
+                                                </p>
+                                                <div class="flex flex-wrap gap-2 mb-3">
+                                                    <span v-for="(t, i) in traders" :key="i" class="bg-violet-50 text-violet-700 text-[10px] font-black px-2 py-1 rounded border border-violet-100 flex items-center gap-1">
+                                                        {{ t }}
+                                                        <button v-if="t !== '本人'" @click="removeTrader(t)" class="hover:text-rose-500 text-violet-400 transition-colors ml-1"><i class="fa-solid fa-xmark"></i></button>
+                                                    </span>
+                                                </div>
+                                                <div class="flex gap-2">
+                                                    <input v-model="newTraderName" type="text" placeholder="輸入新交易者名稱..." class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold text-slate-800 outline-none focus:border-violet-400 focus:bg-white transition-all">
+                                                    <button @click="addTrader" class="bg-violet-500 hover:bg-violet-600 text-white px-3 py-1.5 rounded-lg text-xs font-black transition-all shadow-sm">新增</button>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         <div
                                             class="bg-white border border-slate-300 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
                                             <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
@@ -2041,56 +2186,49 @@
                                         <div class="pl-2 flex-1 flex flex-col">
                                             <div class="flex items-center gap-2 mb-1">
                                                 <span class="text-sm">☁️</span>
-                                                <h3 class="text-sm font-black text-slate-800 tracking-wide">Firebase
-                                                    雲端跨裝置同步</h3>
+                                                <h3 class="text-sm font-black text-slate-800 tracking-wide"><a href="https://jsonbin.io/" target="_blank" class="hover:text-indigo-600 hover:underline transition-colors">JSONBin</a> 雲端跨裝置同步</h3>
                                             </div>
-                                            <p class="text-[10px] text-slate-500 font-bold mb-5 leading-relaxed">
-                                                登入 Google 帳號，您的資料將即時安全備份至 Firebase 雲端。
+                                            <p class="text-[10px] text-slate-500 font-bold mb-3 leading-relaxed">
+                                                輸入您的永久金鑰，實現 100% 受控的手動備份與還原。
                                             </p>
 
-                                            <div v-if="isFirebaseLoading"
-                                                class="text-center py-6 text-slate-400 font-bold text-xs flex-1 flex flex-col items-center justify-center">
-                                                <i class="fa-solid fa-spinner fa-spin mr-2 mb-2 text-2xl"></i>
-                                                <span>載入狀態中...</span>
-                                            </div>
-                                            <div v-else class="flex-1 flex flex-col">
-                                                <div v-if="!firebaseUser"
-                                                    class="flex-1 flex items-center justify-center">
-                                                    <button @click="signInWithGoogle"
-                                                        class="bg-white border-2 border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 px-6 py-4 rounded-xl font-black text-sm flex items-center gap-3 transition-all shadow-sm w-full justify-center">
-                                                        <i class="fa-brands fa-google text-rose-500 text-lg"></i>
-                                                        使用 Google 帳號登入
-                                                    </button>
+                                            <div class="flex-1 flex flex-col gap-3">
+                                                <!-- API Key Input -->
+                                                <div>
+                                                    <label class="block text-[10px] font-black text-slate-500 mb-1">
+                                                        <a href="https://jsonbin.io/app/api-keys" target="_blank" class="hover:text-indigo-600 hover:underline transition-colors inline-flex items-center gap-1">
+                                                            <span>X-Master-Key (永久金鑰)</span>
+                                                            <i class="fa-solid fa-arrow-up-right-from-square text-[8px] opacity-70"></i>
+                                                        </a>
+                                                    </label>
+                                                    <input v-model="jsonbinKey" type="password" placeholder="$2a$10$..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-mono text-slate-700 outline-none focus:border-indigo-500 focus:bg-white transition-all">
                                                 </div>
-                                                <div v-else class="flex-1 flex flex-col justify-between">
-                                                    <div
-                                                        class="mb-4 text-xs font-black text-emerald-600 bg-emerald-50 p-4 rounded-xl border border-emerald-100 flex items-center justify-center gap-2">
-                                                        <i class="fa-solid fa-circle-check text-lg"></i>
-                                                        <span>已登入：{{ firebaseUser.displayName || firebaseUser.email
-                                                            }}</span>
-                                                    </div>
-                                                    <div v-if="syncStatus" class="text-center text-xs font-black mb-4"
-                                                        :class="syncStatus.includes('成功') || syncStatus.includes('完成') ? 'text-emerald-500' : 'text-indigo-500'">
-                                                        {{ syncStatus }}
-                                                    </div>
-                                                    <div class="grid grid-cols-3 gap-2 mt-auto">
-                                                        <button @click="forceDownloadFromFirebase"
-                                                            class="bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-xl text-xs font-black transition-all shadow-sm flex flex-col items-center justify-center gap-2 h-full">
-                                                            <i class="fa-solid fa-cloud-arrow-down text-xl"></i>
-                                                            <span>雲端下載</span>
-                                                        </button>
-                                                        <button @click="forceSyncToFirebase"
-                                                            class="bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-xl text-xs font-black transition-all shadow-sm flex flex-col items-center justify-center gap-2 h-full">
-                                                            <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
-                                                            <span>備份至雲端</span>
-                                                        </button>
-                                                        <button @click="signOutFirebase"
-                                                            class="bg-white border-2 border-slate-200 hover:bg-slate-50 text-slate-600 p-4 rounded-xl text-xs font-black transition-all shadow-sm flex flex-col items-center justify-center gap-2 h-full">
-                                                            <i
-                                                                class="fa-solid fa-arrow-right-from-bracket text-xl text-rose-500"></i>
-                                                            <span>登出帳號</span>
-                                                        </button>
-                                                    </div>
+                                                
+                                                <!-- Bin ID Input -->
+                                                <div>
+                                                    <label class="block text-[10px] font-black text-slate-500 mb-1">Bin ID (資料夾代號)</label>
+                                                    <input v-model="jsonbinId" type="text" placeholder="留白以新建 Bin..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-mono text-slate-700 outline-none focus:border-indigo-500 focus:bg-white transition-all">
+                                                </div>
+
+                                                <div v-if="syncStatus" class="text-center text-xs font-black"
+                                                    :class="syncStatus.includes('成功') || syncStatus.includes('完成') ? 'text-emerald-500' : 'text-rose-500'">
+                                                    {{ syncStatus }}
+                                                </div>
+
+                                                <!-- Action Buttons -->
+                                                <div class="grid grid-cols-3 gap-3 mt-auto pt-2">
+                                                    <button @click="saveJSONBinSettings"
+                                                        class="bg-slate-600 hover:bg-slate-700 text-white p-3 rounded-xl text-xs font-black transition-all shadow-sm flex items-center justify-center gap-2">
+                                                        <span>💾 記住設定</span>
+                                                    </button>
+                                                    <button @click="forceDownloadFromJSONBin"
+                                                        class="bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-xl text-xs font-black transition-all shadow-sm flex items-center justify-center gap-2">
+                                                        <span>📥 雲端下載</span>
+                                                    </button>
+                                                    <button @click="forceSyncToJSONBin"
+                                                        class="bg-indigo-600 hover:bg-indigo-700 text-white p-3 rounded-xl text-xs font-black transition-all shadow-sm flex items-center justify-center gap-2">
+                                                        <span>📤 備份雲端</span>
+                                                    </button>
                                                 </div>
                                             </div>
 
@@ -2110,9 +2248,9 @@
                                     <h2
                                         class="text-3xl font-black text-slate-800 tracking-tighter uppercase font-mono flex items-center justify-center gap-2">
                                         <span>⚡ Terminal Pro</span> <span
-                                            class="bg-indigo-100 text-indigo-700 text-xs px-2.5 py-1 rounded-full font-black font-sans">V5.0</span>
+                                            class="bg-indigo-100 text-indigo-700 text-xs px-2.5 py-1 rounded-full font-black font-sans">V6.0</span>
                                     </h2>
-                                    <p class="text-xs font-bold text-slate-500 mt-2">雙軌風險驗證 · AI 智能降載與接管 · 雲端同步對帳</p>
+                                    <p class="text-xs font-bold text-slate-500 hidden sm:block mt-2">雙軌風險驗證 · AI 智能降載與接管 · 雲端同步對帳</p>
                                 </div>
 
                                 <!-- Tabs Menu -->
@@ -2396,15 +2534,15 @@
                                                 class="p-4 bg-slate-900 text-slate-100 rounded-xl font-mono text-[10px] leading-relaxed flex flex-col justify-between">
                                                 <div>
                                                     <span class="text-violet-400 font-black text-[11px] block mb-1">📊
-                                                        雙軌加權模型</span>
-                                                    * <strong>美股監測</strong>: VIX(20%) + 0050乖離(20%) + 費半乖離(20%) +
-                                                    匯率乖離(15%) + CNN情緒(15%) + 台股恐慌(10%)<br>
-                                                    * <strong>台股監測</strong>: 0050乖離(35%) + 匯率乖離(25%) + 成交量(20%) +
-                                                    三大法人(20%)
+                                                        AI 智能雙軌模型</span>
+                                                    * <strong>🦅 美股 / 總經視角</strong>: VIX恐慌(35%) + QQQ乖離(25%) + CNN情緒(20%) + DXY美元(20%)，純粹捕捉華爾街動能。<br>
+                                                    * <strong>🐳 台股 / 籌碼視角</strong>: 0050乖離(35%) + 匯率乖離(25%) + 成交量(20%) + 法人買賣(20%)，跟蹤真金白銀。
                                                 </div>
                                                 <span
-                                                    class="text-slate-500 text-[9px] mt-2 block border-t border-slate-800 pt-1.5">依當前視圖
-                                                    (美股 vs 台股) 自動切換對應模型。</span>
+                                                    class="text-slate-500 text-[9px] mt-2 block border-t border-slate-800 pt-1.5 flex flex-col gap-1">
+                                                    <span>💡 系統會依您切換的視圖，自動套用對應的評分引擎。</span>
+                                                    <span class="text-rose-400 font-bold">⚠️ 當上方 Macro Risk (利率環境) 惡化時，將無條件覆寫觸發避險！</span>
+                                                </span>
                                             </div>
                                         </div>
 
@@ -2530,13 +2668,13 @@
                                             <div class="flex flex-col gap-4">
                                                 <div class="bg-indigo-50 border border-indigo-100 p-4 rounded-xl mb-6">
                                                     <h4 class="text-xs font-black text-indigo-800 mb-2">
-                                                        ⚠️ 強烈建議：登入 Firebase 雲端備份
+                                                        ⚠️ 強烈建議：設定 JSONBin 雲端備份
                                                     </h4>
                                                     <ul
                                                         class="text-[10px] text-indigo-700 space-y-1.5 list-disc pl-4 font-bold leading-relaxed">
-                                                        <li>使用 Google 帳號登入系統，所有資料都會自動綁定您的帳號並備份。</li>
-                                                        <li>登入後即可實現跨裝置 (手機/電腦) 的資料無縫同步！</li>
-                                                        <li>系統依然會在本機保留一份快取，讓您即使在離線狀態下也能查看基本資料。</li>
+                                                        <li>向 JSONBin.io 獲取免費的永久 API 金鑰，實現 100% 手動可控的跨裝置同步。</li>
+                                                        <li>絕對不強制過期登出，避免因為背景同步造成資料覆蓋的災難。</li>
+                                                        <li>任何手殘覆蓋都可以從 JSONBin 官網中尋找歷史版本進行時光機還原。</li>
                                                     </ul>
                                                 </div>
                                                 <div>
@@ -2562,7 +2700,7 @@
                             <!-- Closing div of instructions view (moved up so Trade Modal is outside) -->
                             <div
                                 class="fixed bottom-4 right-4 text-[10px] text-slate-400/50 font-black tracking-widest pointer-events-none z-0">
-                                2026/03/05 V5.0 by Leon
+                                2026/06/26 V6.0 by Leon
                             </div>
                         </div> <!-- Closes instructions view -->
 
@@ -2640,8 +2778,9 @@
                                             class="col-span-2 flex items-center justify-between bg-slate-50 px-4 py-2.5 rounded-lg border border-slate-200 mt-1">
                                             <div class="flex flex-col">
                                                 <span class="text-xs font-black text-slate-700">同步扣除/增加現金帳戶餘額</span>
-                                                <span
-                                                    class="text-[10px] text-slate-400 font-bold mt-0.5">自動自系統現金餘額進行扣款或入帳</span>
+                                                <span class="text-[10px] text-slate-500 font-bold mt-0.5">
+                                                    目前將同步至：【{{ stocks[tradeModal.stockIndex]?.owner || '本人' }}】的現金帳戶
+                                                </span>
                                             </div>
                                             <label class="relative inline-flex items-center cursor-pointer">
                                                 <input type="checkbox" v-model="tradeModal.syncCash"
@@ -2727,29 +2866,7 @@
                     </div>
 
                     <script type="module">
-                        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-                        import { getAuth, signInWithPopup, signInWithRedirect, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-                        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-                        const firebaseConfig = {
-                            apiKey: "AIzaSyC3_7-w5hVlElYDPMj9IQyA4NBizlFVtJE",
-                            authDomain: "stock-7767b.firebaseapp.com",
-                            projectId: "stock-7767b",
-                            storageBucket: "stock-7767b.firebasestorage.app",
-                            messagingSenderId: "626541563275",
-                            appId: "1:626541563275:web:87bfade6bb59bafcaef38e"
-                        };
-
-                        const app = initializeApp(firebaseConfig);
-                        const auth = getAuth(app);
-                        const db = getFirestore(app);
-                        const provider = new GoogleAuthProvider();
-
-                        window.firebaseApp = {
-                            auth, db, provider,
-                            signInWithPopup, signInWithRedirect, signOut, onAuthStateChanged,
-                            doc, setDoc, getDoc, onSnapshot
-                        };
 
                         const { createApp } = Vue;
                         const DateTime = luxon.DateTime;
@@ -2757,14 +2874,32 @@
                         createApp({
                             data() {
                                 // =============== [Data Initialization] ===============
-                                let safeStocks = [], safeLogs = [], safeCash = 0, safeReconcile = { securitiesCost: 0, bankCash: 0 };
+                                let safeStocks = [], safeLogs = [], safeReconcile = { securitiesCost: 0, bankCash: 0 };
+                                let safeCash = { '本人': 0 };
+                                let safeTraders = ['本人'];
                                 let safeApiToken = '';
                                 let safeLastView = 'dashboard';
                                 let safeUsdtwdRate = 32.5;
 
-                                try { safeStocks = JSON.parse(localStorage.getItem('f_data')) || []; } catch (e) { }
-                                try { safeLogs = JSON.parse(localStorage.getItem('f_deps')) || []; } catch (e) { }
-                                try { safeCash = Number(localStorage.getItem('f_cash')) || 0; } catch (e) { }
+                                try { 
+                                    safeStocks = JSON.parse(localStorage.getItem('f_data')) || []; 
+                                    safeStocks.forEach(s => { if (!s.owner) s.owner = '本人'; });
+                                } catch (e) { }
+                                try { 
+                                    safeLogs = JSON.parse(localStorage.getItem('f_deps')) || []; 
+                                    safeLogs.forEach(l => { if (!l.owner) l.owner = '本人'; });
+                                } catch (e) { }
+                                try { 
+                                    const rawCash = localStorage.getItem('f_cash');
+                                    if (rawCash) {
+                                        if (rawCash.startsWith('{')) safeCash = JSON.parse(rawCash);
+                                        else safeCash = { '本人': Number(rawCash) || 0 };
+                                    }
+                                } catch (e) { }
+                                try {
+                                    const storedTraders = localStorage.getItem('f_traders');
+                                    if (storedTraders) safeTraders = JSON.parse(storedTraders);
+                                } catch (e) {}
                                 try { safeReconcile = JSON.parse(localStorage.getItem('f_reconcile')) || { securitiesCost: 0, bankCash: 0 }; } catch (e) { }
                                 try { safeApiToken = localStorage.getItem('f_api_token') || ''; } catch (e) { }
                                 try { safeUsdtwdRate = Number(localStorage.getItem('f_usdtwd_rate')) || 32.5; } catch (e) { }
@@ -2797,6 +2932,9 @@
                                     instructionTab: 'asset',
                                     simulatedScore: 50,
                                     selectedStrategyMode: 'rebalance',
+                                    traders: safeTraders,
+                                    currentTrader: '所有',
+                                    newTraderName: '',
                                     biasIndex: null,
                                     manualBias: safeManualBias,
                                     usdtwdRate: safeUsdtwdRate,
@@ -2806,8 +2944,8 @@
                                     stocks: safeStocks,
                                     depositLogs: safeLogs,
                                     quickInput: {
-                                        deposit: { amount: null, date: DateTime.now().toFormat('yyyy-MM-dd'), note: '' },
-                                        dividend: { amount: null, date: DateTime.now().toFormat('yyyy-MM-dd'), note: '' }
+                                        deposit: { amount: null, date: DateTime.now().toFormat('yyyy-MM-dd'), note: '', owner: '本人' },
+                                        dividend: { amount: null, date: DateTime.now().toFormat('yyyy-MM-dd'), note: '', owner: '本人' }
                                     },
                                     reconcileForm: safeReconcile,
                                     form: { code: '', shares: null, avgPrice: null, targetRatio: null, inputType: 'shares', investAmountTwd: null },
@@ -2818,7 +2956,8 @@
                                         date: '',
                                         shares: null,
                                         price: null,
-                                        syncCash: true
+                                        syncCash: true,
+                                        owner: '本人'
                                     },
                                     hoverInfo: { label: '', price: '', ratio: '' },
                                     editIndex: null,
@@ -2830,6 +2969,8 @@
                                         yieldCurve3M: safeIndices.yieldCurve3M,
                                         realRate: safeIndices.realRate,
                                         vix: 20,
+                                        qqqBias: 0,
+                                        dxyBias: 0,
                                         soxBias: 0,
                                         usdtwdBias: 0,
                                         bias0050_20: 0,
@@ -2847,8 +2988,8 @@
                                     vixLoading: false,
                                     marketDataLoading: false,
                                     requestCache: {},
-                                    firebaseUser: null,
-                                    isFirebaseLoading: true,
+                                    jsonbinKey: localStorage.getItem('f_jsonbin_key') || '',
+                                    jsonbinId: localStorage.getItem('f_jsonbin_id') || '',
                                     executedTargets: [],
                                     token: safeApiToken || 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyNi0wMi0xMCAwOTo1NzoxMCIsInVzZXJfaWQiOiJsZW9udHNhaTg5ODkiLCJlbWFpbCI6InRvYnl0c2FpODkyNkBnbWFpbC5jb20iLCJpcCI6IjIxMC41OS4xNjUuMTYzIn0.ozgIhgvZFyTwW-Y4GoWsdhwmuLguhA0IzHth-XKX1YE',
                                     apiStatusMsg: '',
@@ -2899,7 +3040,7 @@
                                         {
                                             id: 7,
                                             title: '名詞解釋：什麼是「HEAT SCORE」與「多空比例」？',
-                                            answer: '🔥 **HEAT SCORE 與多空比例計算**<br><br>系統的「多空比例（多頭 vs 空頭）」是由當下的**情緒熱度總分**（即 HEAT SCORE，為 0-100 分）換算而來：<br>1️⃣ **空頭比例 (Bear %)** = `Math.max(2, Math.min(98, HEAT SCORE))`（限制在 2% ~ 98%）<br>2️⃣ **多頭比例 (Bull %)** = `100 - 空頭比例`<br>分數越低（代表恐慌/超跌），做多比例就越高；分數越高（代表貪婪/過熱），做空比例就越高。當分數為 50 時多空各半。<br><br>💡 **加權計分模型 (雙軌制)：**<br>📊 **美股/全球動能**：VIX (20%) + 0050季線乖離 (20%) + 費半季線乖離 (20%) + 匯率季線乖離 (15%) + CNN情緒 (15%) + 台股恐慌 (10%)。<br>📈 **台股籌碼與量能**：0050季線乖離 (35%) + 匯率季線乖離 (25%) + 0050成交量熱度 (20%) + 三大法人買賣超 (20%)。<br><br>🚨 **宏觀覆寫 (Macro Override)：**<br>這是系統的**終極保命機制**。當「系統性風險（如長短債深度倒掛、實質利率高於 2.0% 等）」評估大於 60 分時，AI 會啟動「海嘯防禦模式」，**無視右腦的動能指標**，無條件強制建議減碼 30% 清倉避險！'
+                                            answer: '🔥 **HEAT SCORE 與多空比例計算**<br><br>系統的「多空比例（多頭 vs 空頭）」是由當下的**情緒熱度總分**（即 HEAT SCORE，為 0-100 分）換算而來：<br>1️⃣ **空頭比例 (Bear %)** = `Math.max(2, Math.min(98, HEAT SCORE))`（限制在 2% ~ 98%）<br>2️⃣ **多頭比例 (Bull %)** = `100 - 空頭比例`<br>分數越低（代表恐慌/超跌），做多比例就越高；分數越高（代表貪婪/過熱），做空比例就越高。當分數為 50 時多空各半。<br><br>💡 **AI 智能雙軌模型：**<br>📊 **🦅 美股/總經視角**：純美股動能，由 **VIX恐慌(35%) + QQQ乖離(25%) + CNN情緒(20%) + DXY美元(20%)** 組成，精準捕捉華爾街資金動能與系統風險。<br>📈 **🐳 台股/籌碼視角**：由 **0050乖離(35%) + 匯率乖離(25%) + 成交量(20%) + 法人買賣(20%)** 組成，鎖定外資與法人的真金白銀動向。<br><br>🚨 **宏觀覆寫 (Macro Override)：**<br>這是系統的**終極保命機制**。當頂部的「利率環境矩陣 (Macro Risk Engine)」評估大於 60 分時，AI 會啟動「海嘯防禦模式」，**無視底下的動能指標**，無條件強制建議減碼 30% 清倉避險！'
                                         },
                                         {
                                             id: 8,
@@ -2926,6 +3067,12 @@
                             },
                             watch: {
                                 // =============== [Watchers] ===============
+                                jsonbinKey(val) {
+                                    localStorage.setItem('f_jsonbin_key', val);
+                                },
+                                jsonbinId(val) {
+                                    localStorage.setItem('f_jsonbin_id', val);
+                                },
                                 currentView(val) {
                                     localStorage.setItem('f_last_view', val);
                                     if (val === 'dashboard') {
@@ -2943,17 +3090,25 @@
                             },
                             computed: {
                                 // =============== [Computed Properties] ===============
+                                currentCash() {
+                                    if (this.currentTrader === '所有') {
+                                        return Object.values(this.cash).reduce((sum, val) => sum + (val || 0), 0);
+                                    }
+                                    return this.cash[this.currentTrader] || 0;
+                                },
                                 totalMarketValue() {
-                                    return Math.round(this.stocks.reduce((sum, s) => sum + (s.shares * (s.currentPrice || 0)), 0));
+                                    const stks = this.currentTrader === '所有' ? this.stocks : this.stocks.filter(s => (s.owner || '本人') === this.currentTrader);
+                                    return Math.round(stks.reduce((sum, s) => sum + (s.shares * (s.currentPrice || 0)), 0));
                                 },
                                 totalCost() {
-                                    return Math.round(this.stocks.reduce((sum, s) => sum + (s.shares * this.getStockAvgPriceTwd(s)), 0));
+                                    const stks = this.currentTrader === '所有' ? this.stocks : this.stocks.filter(s => (s.owner || '本人') === this.currentTrader);
+                                    return Math.round(stks.reduce((sum, s) => sum + (s.shares * this.getStockAvgPriceTwd(s)), 0));
                                 },
                                 isFormCodeUsStock() {
                                     const code = String(this.form.code || '').trim().toUpperCase();
                                     if (!code) return false;
                                     if (code === 'AU9901') return false;
-                                    if (/^\d+$/.test(code)) return false;
+                                    if (/^\d/.test(code)) return false;
                                     if (code.endsWith('.TW') || code.endsWith('.TWO')) return false;
                                     return true;
                                 },
@@ -2973,10 +3128,12 @@
                                     return cost === 0 ? 0 : (((this.totalMarketValue - cost) / cost) * 100).toFixed(1);
                                 },
                                 totalDeposits() {
-                                    return this.depositLogs.filter(l => !l.type || l.type === 'deposit').reduce((sum, l) => sum + l.amount, 0);
+                                    const logs = this.currentTrader === '所有' ? this.depositLogs : this.depositLogs.filter(d => (d.owner || '本人') === this.currentTrader);
+                                    return logs.filter(l => !l.type || l.type === 'deposit' || l.type === 'adjustment').reduce((sum, l) => sum + l.amount, 0);
                                 },
                                 totalDividends() {
-                                    return this.depositLogs.filter(l => l.type === 'dividend').reduce((sum, l) => sum + l.amount, 0);
+                                    const logs = this.currentTrader === '所有' ? this.depositLogs : this.depositLogs.filter(d => (d.owner || '本人') === this.currentTrader);
+                                    return logs.filter(l => l.type === 'dividend').reduce((sum, l) => sum + l.amount, 0);
                                 },
                                 monthlyAvgDeposit() {
                                     if (this.depositLogs.length === 0) return 0;
@@ -2984,7 +3141,8 @@
                                 },
                                 thisYearDividends() {
                                     const currentYear = new Date().getFullYear().toString();
-                                    return this.depositLogs.filter(l => l.type === 'dividend' && l.date.startsWith(currentYear)).reduce((sum, l) => sum + l.amount, 0);
+                                    const logs = this.currentTrader === '所有' ? this.depositLogs : this.depositLogs.filter(d => (d.owner || '本人') === this.currentTrader);
+                                    return logs.filter(l => l.type === 'dividend' && l.date.startsWith(currentYear)).reduce((sum, l) => sum + l.amount, 0);
                                 },
                                 displayBias() {
                                     if (this.manualBias !== null) return this.manualBias;
@@ -3038,27 +3196,7 @@
                                 },
 
                                 momentumScore() {
-                                    const b = this.manualBias !== null ? this.manualBias : parseFloat(this.biasIndex || 0);
                                     const cnnVal = this.indices.cnn || 50;
-                                    const twVal = this.indices.twFear || 50;
-
-                                    let score0050 = 50;
-                                    const deadZone = 3.0;
-                                    if (b > deadZone) score0050 = 50 + ((b - deadZone) * 4.16);
-                                    else if (b < -deadZone) score0050 = 50 + ((b + deadZone) * 4.16);
-                                    score0050 = Math.max(0, Math.min(100, score0050));
-
-                                    let scoreSox = 50;
-                                    const soxB = this.indices.soxBias || 0;
-                                    if (soxB > 5.0) scoreSox = 50 + ((soxB - 5.0) * 2.5);
-                                    else if (soxB < -5.0) scoreSox = 50 + ((soxB + 5.0) * 2.5);
-                                    scoreSox = Math.max(0, Math.min(100, scoreSox));
-
-                                    let scoreUsdTwd = 50;
-                                    const usdTwdB = this.indices.usdtwdBias || 0;
-                                    if (usdTwdB > 0.5) scoreUsdTwd = 50 + ((usdTwdB - 0.5) * 20);
-                                    else if (usdTwdB < -0.5) scoreUsdTwd = 50 + ((usdTwdB + 0.5) * 20);
-                                    scoreUsdTwd = Math.max(0, Math.min(100, scoreUsdTwd));
 
                                     let scoreVix = 50;
                                     if (this.indices.vix) {
@@ -3073,14 +3211,18 @@
                                         }
                                     }
 
-                                    const weightedScore =
-                                        (scoreVix * 0.20) +
-                                        (score0050 * 0.20) +
-                                        (scoreSox * 0.20) +
-                                        (scoreUsdTwd * 0.15) +
-                                        (cnnVal * 0.15) +
-                                        (twVal * 0.10);
+                                    let scoreQQQ = 50;
+                                    const qb = this.indices.qqqBias || 0;
+                                    scoreQQQ = ((qb + 8) / 20) * 100;
+                                    scoreQQQ = Math.max(0, Math.min(100, scoreQQQ));
 
+                                    let scoreDxy = 50;
+                                    const db = this.indices.dxyBias || 0;
+                                    scoreDxy = 50 - (db * 15);
+                                    scoreDxy = Math.max(0, Math.min(100, scoreDxy));
+
+                                    // 四維度全方位：VIX(35%) + QQQ(25%) + CNN(20%) + DXY(20%)
+                                    const weightedScore = (scoreVix * 0.35) + (scoreQQQ * 0.25) + (cnnVal * 0.20) + (scoreDxy * 0.20);
                                     const total = Math.round(weightedScore);
 
                                     let status = '中立震盪';
@@ -3097,7 +3239,7 @@
                                         total,
                                         status,
                                         colorClass,
-                                        details: { vix: scoreVix, bias: score0050, cnn: cnnVal, tw: twVal, sox: scoreSox, usdtwd: scoreUsdTwd }
+                                        details: { vix: scoreVix, cnn: cnnVal, qqq: scoreQQQ, dxy: scoreDxy }
                                     };
                                 },
 
@@ -3420,6 +3562,28 @@
                                 }
                             },
                             methods: {
+                                // =============== [Trader Management] ===============
+                                addTrader() {
+                                    const name = this.newTraderName.trim();
+                                    if (name && !this.traders.includes(name)) {
+                                        this.traders.push(name);
+                                        if (this.cash[name] === undefined) {
+                                            this.cash[name] = 0;
+                                        }
+                                        localStorage.setItem('f_traders', JSON.stringify(this.traders));
+                                        this.saveData();
+                                    }
+                                    this.newTraderName = '';
+                                },
+                                removeTrader(name) {
+                                    if (name === '本人') return;
+                                    if (confirm(`確定要刪除子帳戶「${name}」嗎？\n注意：這不會刪除該帳戶的現有股票與入金紀錄，但建議您先將其資產清空。`)) {
+                                        this.traders = this.traders.filter(t => t !== name);
+                                        if (this.currentTrader === name) this.currentTrader = '所有';
+                                        localStorage.setItem('f_traders', JSON.stringify(this.traders));
+                                        this.saveData();
+                                    }
+                                },
                                 aiStrategySuggestion(item) {
                                     if (this.aiStrategy.percent === 0) return { type: 'HOLD', actionShares: 0, amount: 0, code: item.code };
                                     const percent = this.aiStrategy.percent;
@@ -3708,7 +3872,7 @@
                                     if (rawCode === 'AU9901') return '臺銀金 (黃金現貨)';
 
                                     // Only query FinMind for numeric codes (Taiwan stocks)
-                                    if (/^\d+$/.test(rawCode)) {
+                                    if (/^\d/.test(rawCode)) {
                                         try {
                                             const urls = [
                                                 `https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockInfo&data_id=${rawCode}${this.token && this.token.trim() ? `&token=${encodeURIComponent(this.token.trim())}` : ''}`,
@@ -3821,6 +3985,8 @@
                                         this.fetch0050VolumeHeat(),
                                         this.fetchDualMABias('TWD=X', 'usdtwdBias'),
                                         this.fetchTaiwanInstitutionalFlow(),
+                                        this.fetchDualMABias('QQQ', 'qqqBias'),
+                                        this.fetchDualMABias('DX-Y.NYB', 'dxyBias'),
 
                                         // 新增的總經數據自動抓取
                                         this.fetchFredData('T10Y2Y', 'yieldCurve'),
@@ -4098,11 +4264,13 @@
                                             stock.avgPrice = oldShares === 0 ? buyPrice : ((oldShares * oldAvg) + (action.shares * buyPrice)) / stock.shares;
                                             stock.avgPrice = parseFloat(stock.avgPrice.toFixed(stock.currency === 'USD' ? 4 : 2));
 
-                                            this.cash -= amount;
+                                            const owner = stock.owner || '本人';
+                                            this.cash[owner] -= amount;
                                         } else {
                                             stock.shares = parseFloat((stock.shares - action.shares).toFixed(stock.currency === 'USD' ? 4 : 2));
                                             if (stock.shares < 0) stock.shares = 0;
-                                            this.cash += amount;
+                                            const owner = stock.owner || '本人';
+                                            this.cash[owner] += amount;
                                         }
                                         this.saveData();
                                     }
@@ -4128,11 +4296,13 @@
                                             stock.avgPrice = oldShares === 0 ? buyPrice : ((oldShares * oldAvg) + (shares * buyPrice)) / stock.shares;
                                             stock.avgPrice = parseFloat(stock.avgPrice.toFixed(stock.currency === 'USD' ? 4 : 2));
 
-                                            this.cash -= amount;
+                                            const owner = stock.owner || '本人';
+                                            this.cash[owner] -= amount;
                                         } else {
                                             stock.shares = parseFloat((stock.shares - shares).toFixed(stock.currency === 'USD' ? 4 : 2));
                                             if (stock.shares < 0) stock.shares = 0;
-                                            this.cash += amount;
+                                            const owner = stock.owner || '本人';
+                                            this.cash[owner] += amount;
                                         }
 
                                         this.executedTargets.push(sim.code);
@@ -4160,11 +4330,13 @@
                                                     stock.avgPrice = oldShares === 0 ? buyPrice : ((oldShares * oldAvg) + (shares * buyPrice)) / stock.shares;
                                                     stock.avgPrice = parseFloat(stock.avgPrice.toFixed(stock.currency === 'USD' ? 4 : 2));
 
-                                                    this.cash -= amount;
+                                                    const owner = stock.owner || '本人';
+                                                    this.cash[owner] -= amount;
                                                 } else {
                                                     stock.shares = parseFloat((stock.shares - shares).toFixed(stock.currency === 'USD' ? 4 : 2));
                                                     if (stock.shares < 0) stock.shares = 0;
-                                                    this.cash += amount;
+                                                    const owner = stock.owner || '本人';
+                                                    this.cash[owner] += amount;
                                                 }
                                                 this.executedTargets.push(sim.code);
                                             }
@@ -4177,7 +4349,7 @@
                                 // =============== [Local Storage Helpers] ===============
                                 saveDataToLocal() {
                                     localStorage.setItem('f_data', JSON.stringify(this.stocks));
-                                    localStorage.setItem('f_cash', this.cash);
+                                    localStorage.setItem('f_cash', JSON.stringify(this.cash));
                                     localStorage.setItem('f_deps', JSON.stringify(this.depositLogs));
                                     localStorage.setItem('f_indices', JSON.stringify({
                                         cnn: this.indices.cnn,
@@ -4194,12 +4366,6 @@
                                 saveData() {
                                     this.localUpdatedAt = DateTime.now().toISO();
                                     this.saveDataToLocal();
-                                    if (this.firebaseUser && window.firebaseApp && !this.isFirebaseLoading) {
-                                        if (this._firebaseSaveTimeout) clearTimeout(this._firebaseSaveTimeout);
-                                        this._firebaseSaveTimeout = setTimeout(() => {
-                                            this.saveDataToFirebase();
-                                        }, 2000);
-                                    }
                                 },
 
                                 saveReconcileData() {
@@ -4218,7 +4384,9 @@
                                         type: type
                                     });
 
-                                    this.cash += input.amount;
+                                    const owner = input.owner || '本人';
+                                    if (this.cash[owner] === undefined) this.cash[owner] = 0;
+                                    this.cash[owner] += input.amount;
                                     input.amount = null;
                                     input.note = '';
                                     this.saveData();
@@ -4227,10 +4395,99 @@
                                 removeDeposit(idx) {
                                     if (confirm('確定刪除此筆紀錄？\n\n(系統將自動自可用現金餘額中扣回/加回此筆金額)')) {
                                         const log = this.depositLogs[idx];
-                                        this.cash -= log.amount;
+                                        const owner = log.owner || '本人';
+                                        this.cash[owner] -= log.amount;
                                         this.depositLogs.splice(idx, 1);
                                         this.saveData();
                                     }
+                                },
+
+                                exportUnifiedCSV() {
+                                    const deposits = this.depositLogs.filter(d => !d.type || d.type === 'deposit' || d.type === 'adjustment');
+                                    const dividends = this.depositLogs.filter(d => d.type === 'dividend');
+                                    
+                                    const maxLen = Math.max(deposits.length, dividends.length);
+                                    let csvContent = "Date,入金(元),備註,入金帳戶,,data,累積現金股利,配息(元),配息帳戶\n";
+                                    
+                                    for(let i=0; i<maxLen; i++) {
+                                        const dep = deposits[i] || { date: '', amount: '', note: '', owner: '' };
+                                        const div = dividends[i] || { date: '', amount: '', note: '', owner: '' };
+                                        
+                                        const depNote = dep.note ? `"${dep.note.replace(/"/g, '""')}"` : "";
+                                        const divNote = div.note ? `"${div.note.replace(/"/g, '""')}"` : "";
+                                        const depOwner = dep.date ? (dep.owner || '本人') : '';
+                                        const divOwner = div.date ? (div.owner || '本人') : '';
+                                        
+                                        csvContent += `${dep.date},${dep.amount !== '' ? dep.amount : ''},${depNote},${depOwner},,${div.date},${divNote},${div.amount !== '' ? div.amount : ''},${divOwner}\n`;
+                                    }
+                                    
+                                    const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+                                    const blob = new Blob([bom, csvContent], { type: 'text/csv;charset=utf-8;' });
+                                    const link = document.createElement("a");
+                                    link.setAttribute("href", URL.createObjectURL(blob));
+                                    link.setAttribute("download", 'Account_History.csv');
+                                    link.style.visibility = 'hidden';
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                },
+
+                                importUnifiedCSV(event) {
+                                    const file = event.target.files[0];
+                                    if (!file) return;
+                                    
+                                    if (!confirm(`警告：匯入新檔案將會「完全覆蓋」您現有的入金與配息紀錄，確定繼續？\n\n建議先執行匯出備份。`)) {
+                                        event.target.value = '';
+                                        return;
+                                    }
+
+                                    const reader = new FileReader();
+                                    reader.onload = (e) => {
+                                        try {
+                                            const text = e.target.result;
+                                            const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+                                            
+                                            if (lines[0].includes('Date') || lines[0].includes('日期') || lines[0].includes('入金')) {
+                                                lines.shift();
+                                            }
+                                            
+                                            const newLogs = [];
+                                            for (let line of lines) {
+                                                const parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                                                
+                                                if (parts.length >= 2) {
+                                                    const depDate = parts[0] ? parts[0].replace(/"/g, '').trim() : '';
+                                                    const depAmtStr = parts[1] ? parts[1].replace(/"/g, '').replace(/,/g, '').trim() : '';
+                                                    const depNote = parts[2] ? parts[2].replace(/^"|"$/g, '').trim() : '';
+                                                    const depOwner = parts[3] ? parts[3].replace(/^"|"$/g, '').trim() : '本人';
+                                                    
+                                                    if (depDate && depAmtStr !== '' && !isNaN(parseFloat(depAmtStr))) {
+                                                        newLogs.push({ date: depDate, amount: parseFloat(depAmtStr), note: depNote, type: 'deposit', owner: depOwner || '本人' });
+                                                    }
+                                                }
+                                                
+                                                if (parts.length >= 6) {
+                                                    const divDate = parts[4] ? parts[4].replace(/"/g, '').trim() : '';
+                                                    const divNote = parts[5] ? parts[5].replace(/^"|"$/g, '').trim() : '';
+                                                    const divAmtStr = parts[6] ? parts[6].replace(/"/g, '').replace(/,/g, '').trim() : '';
+                                                    const divOwner = parts[7] ? parts[7].replace(/^"|"$/g, '').trim() : '本人';
+                                                    
+                                                    if (divDate && divAmtStr !== '' && !isNaN(parseFloat(divAmtStr))) {
+                                                        newLogs.push({ date: divDate, amount: parseFloat(divAmtStr), note: divNote, type: 'dividend', owner: divOwner || '本人' });
+                                                    }
+                                                }
+                                            }
+                                            
+                                            this.depositLogs = newLogs.sort((a, b) => new Date(b.date) - new Date(a.date));
+                                            this.saveData();
+                                            alert('匯入成功！');
+                                        } catch (err) {
+                                            console.error(err);
+                                            alert('CSV 格式錯誤，匯入失敗。請確保格式符合匯出範本。');
+                                        }
+                                        event.target.value = '';
+                                    };
+                                    reader.readAsText(file);
                                 },
 
                                 // =============== [Table Interactions] ===============
@@ -4241,7 +4498,7 @@
                                 },
 
                                 calculateCurrentRatio(item) {
-                                    const t = this.totalMarketValue + this.cash;
+                                    const t = this.totalMarketValue + this.currentCash;
                                     return t === 0 ? 0 : ((item.shares * (item.currentPrice || 0) / t) * 100).toFixed(1);
                                 },
 
@@ -4391,10 +4648,11 @@
                                     this.recalculateStockFromTransactions(stock);
 
                                     if (this.tradeModal.syncCash) {
+                                        const owner = stock.owner || '本人';
                                         if (isBuy) {
-                                            this.cash -= totalAmountTwd;
+                                            this.cash[owner] -= totalAmountTwd;
                                         } else {
-                                            this.cash += totalAmountTwd;
+                                            this.cash[owner] += totalAmountTwd;
                                         }
                                     }
 
@@ -4413,10 +4671,11 @@
                                         const priceTwd = isUs ? (tx.price * this.usdtwdRate) : tx.price;
                                         const totalAmountTwd = Math.round(tx.shares * priceTwd);
 
+                                        const owner = stock.owner || '本人';
                                         if (tx.type === 'BUY') {
-                                            this.cash += totalAmountTwd;
+                                            this.cash[owner] += totalAmountTwd;
                                         } else {
-                                            this.cash -= totalAmountTwd;
+                                            this.cash[owner] -= totalAmountTwd;
                                         }
                                     }
 
@@ -4495,6 +4754,19 @@
                                     this.dragLog = null;
                                 },
 
+                                startEditLog(log) {
+                                    if (log.date) {
+                                        let parts = log.date.split(/[\/\-]/);
+                                        if (parts.length === 3) {
+                                            let y = parts[0];
+                                            let m = parts[1].padStart(2, '0');
+                                            let d = parts[2].padStart(2, '0');
+                                            log.date = `${y}-${m}-${d}`;
+                                        }
+                                    }
+                                    this.editDepositIndex = this.depositLogs.indexOf(log);
+                                },
+
                                 saveLog() {
                                     this.editDepositIndex = null;
                                     this.saveData();
@@ -4508,98 +4780,33 @@
                                     setTimeout(() => this.apiStatusMsg = '', 2000);
                                 },
 
-                                async signInWithGoogle() {
-                                    if (!window.firebaseApp) return alert('Firebase 尚未初始化');
-                                    try {
-                                        await window.firebaseApp.signInWithPopup(window.firebaseApp.auth, window.firebaseApp.provider);
-                                    } catch (e) {
-                                        console.error(e);
-                                        alert('登入失敗: ' + e.message);
-                                    }
-                                },
-
-                                async signOutFirebase() {
-                                    if (!window.firebaseApp) return;
-                                    try {
-                                        await window.firebaseApp.signOut(window.firebaseApp.auth);
-                                        this.firebaseUser = null;
-                                        alert('已登出');
-                                    } catch (e) {
-                                        console.error(e);
-                                    }
-                                },
-
-                                async loadDataFromFirebase() {
-                                    // For manual refresh backward compatibility
-                                    if (!this.firebaseUser || !window.firebaseApp) return;
-                                    this.syncStatus = '強制下載中...';
-                                    try {
-                                        const docRef = window.firebaseApp.doc(window.firebaseApp.db, 'users', this.firebaseUser.uid);
-                                        const docSnap = await window.firebaseApp.getDoc(docRef);
-                                        if (docSnap.exists()) {
-                                            this.applyFirebaseData(docSnap.data());
-                                            console.log("已手動從 Firebase 載入最新資料");
-                                        } else {
-                                            console.log("Firebase 尚無資料，將本機資料上傳...");
-                                            this.saveDataToFirebase();
-                                        }
-                                    } catch (e) {
-                                        console.error("載入 Firebase 資料失敗:", e);
-                                    }
-                                },
-
-                                setupFirebaseListener() {
-                                    if (!this.firebaseUser || !window.firebaseApp) return;
-                                    if (this._firebaseUnsubscribe) this._firebaseUnsubscribe();
-
-                                    const docRef = window.firebaseApp.doc(window.firebaseApp.db, 'users', this.firebaseUser.uid);
-                                    this._firebaseUnsubscribe = window.firebaseApp.onSnapshot(docRef, (docSnap) => {
-                                        if (docSnap.exists()) {
-                                            if (docSnap.metadata.hasPendingWrites) {
-                                                // Ignore local writes
-                                                return;
-                                            }
-                                            const data = docSnap.data();
-                                            this.applyFirebaseData(data);
-                                            console.log("已從 Firebase 自動同步最新資料");
-                                        } else {
-                                            this.saveDataToFirebase();
-                                        }
-                                    }, (error) => {
-                                        console.error("Firebase 即時同步失敗:", error);
-                                    });
-                                },
-
-                                applyFirebaseData(data) {
+                                applyCloudData(data) {
+                                    if (data.traders) this.traders = data.traders;
                                     if (data.stocks) this.stocks = data.stocks;
                                     if (data.depositLogs) this.depositLogs = data.depositLogs;
-                                    if (data.cash !== undefined) this.cash = data.cash;
+                                    if (data.cash !== undefined) {
+                                        if (typeof data.cash === 'number') this.cash = { '本人': data.cash };
+                                        else this.cash = data.cash;
+                                    }
                                     if (data.reconcileForm) this.reconcileForm = data.reconcileForm;
                                     if (data.indices) this.indices = Object.assign(this.indices, data.indices);
                                     if (data.manualBias !== undefined) this.manualBias = data.manualBias;
                                     if (data.usdtwdRate) this.usdtwdRate = data.usdtwdRate;
-                                    if (data.updatedAt) {
-                                        this.localUpdatedAt = data.updatedAt;
-                                        localStorage.setItem('f_updated_at', data.updatedAt);
-                                    }
+                                    
                                     this.saveDataToLocal();
                                 },
 
-                                async saveDataToFirebase() {
-                                    if (!this.firebaseUser || !window.firebaseApp) return;
-                                    if (!this.syncStatus.includes('強制')) {
-                                        this.syncStatus = '同步中...';
+                                async forceSyncToJSONBin() {
+                                    if (!this.jsonbinKey) {
+                                        this.syncStatus = '請先輸入 API Key';
+                                        return;
                                     }
+                                    
+                                    this.syncStatus = '上傳中...';
                                     try {
-                                        const docRef = window.firebaseApp.doc(window.firebaseApp.db, 'users', this.firebaseUser.uid);
                                         const now = DateTime.now().toISO();
-
-                                        // Sync local time before upload to avoid onSnapshot triggering an overwrite
-                                        this.localUpdatedAt = now;
-                                        localStorage.setItem('f_updated_at', now);
-
-                                        // Strip Vue Proxies for lightning-fast Firebase serialization
                                         const plainData = JSON.parse(JSON.stringify({
+                                            traders: this.traders,
                                             stocks: this.stocks,
                                             depositLogs: this.depositLogs,
                                             cash: this.cash,
@@ -4615,31 +4822,91 @@
                                             usdtwdRate: this.usdtwdRate,
                                             updatedAt: now
                                         }));
+                                        const cleanKey = this.jsonbinKey.trim();
+                                        const cleanId = this.jsonbinId ? this.jsonbinId.trim() : '';
+                                        const url = cleanId ? `https://api.jsonbin.io/v3/b/${cleanId}` : `https://api.jsonbin.io/v3/b`;
+                                        const method = cleanId ? 'PUT' : 'POST';
 
-                                        // Fire-and-forget background upload for instant UI feedback
-                                        window.firebaseApp.setDoc(docRef, plainData).catch(e => {
-                                            console.error("寫入 Firebase 失敗:", e);
-                                            this.syncStatus = '同步失敗';
+                                        const response = await fetch(url, {
+                                            method: method,
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-Master-Key': cleanKey,
+                                                'X-Access-Key': cleanKey, // Fallback in case user provided Access Key instead of Master Key
+                                                'X-Bin-Private': 'true'
+                                            },
+                                            body: JSON.stringify(plainData)
                                         });
 
-                                        this.syncStatus = '雲端同步完成';
+                                        if (!response.ok) {
+                                            const errorText = await response.text();
+                                            throw new Error(`[${response.status}] ${errorText}`);
+                                        }
+                                        
+                                        const result = await response.json();
+                                        
+                                        // If it was a POST, we need to save the new Bin ID
+                                        if (!this.jsonbinId && result.metadata && result.metadata.id) {
+                                            this.jsonbinId = result.metadata.id;
+                                        }
+
+                                        this.syncStatus = '手動備份成功！';
                                         setTimeout(() => this.syncStatus = '', 2000);
                                     } catch (e) {
-                                        console.error("準備寫入 Firebase 時發生錯誤:", e);
-                                        this.syncStatus = '同步失敗';
+                                        console.error("JSONBin 上傳錯誤:", e);
+                                        this.syncStatus = '上傳失敗';
+                                        alert(e.message || '上傳失敗，請檢查 API Key 是否正確或網路是否連線。');
                                     }
                                 },
 
-                                async forceSyncToFirebase() {
-                                    this.syncStatus = '強制上傳中...';
-                                    await this.saveDataToFirebase();
+                                saveJSONBinSettings() {
+                                    if (this.jsonbinKey) {
+                                        this.jsonbinKey = this.jsonbinKey.trim();
+                                        localStorage.setItem('f_jsonbin_key', this.jsonbinKey);
+                                    }
+                                    if (this.jsonbinId) {
+                                        this.jsonbinId = this.jsonbinId.trim();
+                                        localStorage.setItem('f_jsonbin_id', this.jsonbinId);
+                                    }
+                                    this.syncStatus = '🔑 設定已成功記住！';
+                                    setTimeout(() => this.syncStatus = '', 2000);
                                 },
 
-                                async forceDownloadFromFirebase() {
-                                    this.syncStatus = '強制下載中...';
-                                    await this.loadDataFromFirebase();
-                                    this.syncStatus = '雲端下載完成';
-                                    setTimeout(() => this.syncStatus = '', 2000);
+                                async forceDownloadFromJSONBin() {
+                                    if (!this.jsonbinKey || !this.jsonbinId) {
+                                        this.syncStatus = '請輸入 Key 與 Bin ID';
+                                        return;
+                                    }
+
+                                    this.syncStatus = '下載中...';
+                                    try {
+                                        const cleanKey = this.jsonbinKey.trim();
+                                        const cleanId = this.jsonbinId.trim();
+                                        const response = await fetch(`https://api.jsonbin.io/v3/b/${cleanId}/latest`, {
+                                            headers: {
+                                                'X-Master-Key': cleanKey,
+                                                'X-Access-Key': cleanKey
+                                            }
+                                        });
+
+                                        if (!response.ok) {
+                                            const errorText = await response.text();
+                                            throw new Error(`[${response.status}] ${errorText}`);
+                                        }
+                                        
+                                        const result = await response.json();
+                                        if (result.record) {
+                                            this.applyCloudData(result.record);
+                                            this.syncStatus = '手動下載成功！';
+                                        } else {
+                                            this.syncStatus = '無備份資料';
+                                        }
+                                        
+                                        setTimeout(() => this.syncStatus = '', 2000);
+                                    } catch (e) {
+                                        console.error("JSONBin 下載錯誤:", e);
+                                        this.syncStatus = '下載失敗';
+                                    }
                                 },
 
                                 clearLogs() {
@@ -4665,22 +4932,8 @@
                                 }
                             },
                             mounted() {
-                                if (window.firebaseApp) {
-                                    window.firebaseApp.onAuthStateChanged(window.firebaseApp.auth, async (user) => {
-                                        this.firebaseUser = user;
-                                        if (user) {
-                                            this.setupFirebaseListener();
-                                        }
-                                        this.isFirebaseLoading = false;
-
-                                        this.refreshMarketData();
-                                        this.stocks.forEach(s => this.fetchStockInfo(s));
-                                    });
-                                } else {
-                                    this.isFirebaseLoading = false;
-                                    this.refreshMarketData();
-                                    this.stocks.forEach(s => this.fetchStockInfo(s));
-                                }
+                                this.refreshMarketData();
+                                this.stocks.forEach(s => this.fetchStockInfo(s));
 
                                 setInterval(() => {
                                     this.refreshMarketData();
