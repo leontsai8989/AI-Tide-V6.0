@@ -4560,17 +4560,8 @@
                                                 return;
                                             }
                                             const data = docSnap.data();
-                                            const serverTime = data.updatedAt;
-                                            const localTime = localStorage.getItem('f_updated_at');
-
-                                            if (serverTime && localTime && serverTime < localTime) {
-                                                // Local data is newer (e.g. browser was closed before debounce finished)
-                                                console.log("發現本地資料較新，覆蓋雲端...");
-                                                this.saveDataToFirebase();
-                                            } else {
-                                                this.applyFirebaseData(data);
-                                                console.log("已從 Firebase 自動同步最新資料");
-                                            }
+                                            this.applyFirebaseData(data);
+                                            console.log("已從 Firebase 自動同步最新資料");
                                         } else {
                                             this.saveDataToFirebase();
                                         }
