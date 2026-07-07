@@ -552,251 +552,173 @@
                     </button>
                 </div>
 
-                <div class="sentiment-radar-panel rounded-2xl overflow-hidden shadow-xl border"
-                    :class="sentimentVerdict.panelClass" v-if="currentView === 'us_market'">
+                <div v-if="currentView === 'us_market'" class="flex flex-col gap-3">
 
-                    <div class="grid grid-cols-1 md:grid-cols-[auto_1fr_auto] gap-0">
-
-                        <div class="verdict-block flex flex-col items-center justify-center px-6 py-5 min-w-[160px]"
-                            :style="{ background: sentimentVerdict.bgGradient }">
-                            <div class="verdict-icon-wrap relative flex items-center justify-center mb-2">
-                                <div class="verdict-ring" :class="sentimentVerdict.ringClass"></div>
-                                <span class="verdict-emoji text-5xl z-10 relative drop-shadow-lg">{{
-                                    sentimentVerdict.emoji }}</span>
+                    <!-- AI Insight Center (US Market - MUJI Style) -->
+                    <div class="bg-[#faf9f5] border border-[#e5e0d8] p-5 rounded-xl relative transition-all duration-300 shadow-sm">
+                        <div class="flex items-start gap-4 relative z-10">
+                            <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center text-sm font-medium tracking-widest border rounded"
+                                 :class="aiUsInsight.iconTheme">
+                                {{ aiUsInsight.emoji }}
                             </div>
-                            <div
-                                class="verdict-label font-black text-white text-xl tracking-widest uppercase leading-tight text-center drop-shadow">
-                                {{ sentimentVerdict.label }}
-                            </div>
-                            <div
-                                class="verdict-sublabel mt-1 text-xs font-bold text-white/70 tracking-widest uppercase text-center">
-                                {{ sentimentVerdict.sublabel }}
-                            </div>
-                            <div
-                                class="mt-3 px-3 py-1 rounded-full text-xs font-black tracking-widest border border-white/30 bg-white/15 backdrop-blur text-white">
-                                SCORE {{ activeMarketScore.total }}
-                            </div>
-                        </div>
-
-                        <div class="power-bar-block flex flex-col justify-center px-5 py-5 bg-slate-950/90">
-                            <div class="flex justify-between items-center mb-3">
-                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">量能力道 ·
-                                    多空對比</span>
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded border"
-                                    :class="sentimentVerdict.tagClass">{{ sentimentVerdict.tag }}</span>
-                            </div>
-
-                            <div class="relative h-8 rounded-xl overflow-hidden bg-slate-800 flex mb-2">
-                                <div class="bull-bar flex items-center justify-center transition-all duration-700 ease-out relative overflow-hidden"
-                                    :style="{ width: sentimentVerdict.bullPct + '%' }"
-                                    :class="sentimentVerdict.bullBarClass">
-                                    <span class="text-xs font-black text-white z-10 drop-shadow whitespace-nowrap px-2"
-                                        v-if="sentimentVerdict.bullPct > 18">
-                                        ▲ 多 {{ Math.round(sentimentVerdict.bullPct) }}%
-                                    </span>
-                                    <div class="shimmer-effect absolute inset-0 opacity-30"></div>
-                                </div>
-                                <div class="bear-bar flex items-center justify-center transition-all duration-700 ease-out relative overflow-hidden"
-                                    :style="{ width: sentimentVerdict.bearPct + '%' }"
-                                    :class="sentimentVerdict.bearBarClass">
-                                    <span class="text-xs font-black text-white z-10 drop-shadow whitespace-nowrap px-2"
-                                        v-if="sentimentVerdict.bearPct > 18">
-                                        ▼ 空 {{ Math.round(sentimentVerdict.bearPct) }}%
-                                    </span>
-                                    <div class="shimmer-effect absolute inset-0 opacity-30"></div>
-                                </div>
-                            </div>
-                            <div class="flex justify-between text-[10px] font-black text-slate-500">
-                                <span class="text-emerald-400">◀ 做多 (Buy)</span>
-                                <span class="text-rose-400">(Sell) 做空 ▶</span>
-                            </div>
-                        </div>
-
-                        <div
-                            class="summary-col flex flex-col justify-center gap-3.5 px-5 py-5 bg-slate-950/90 border-l border-slate-800 min-w-[150px]">
-                            <div
-                                class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-1 text-center">
-                                快速判讀</div>
-
-                            <div class="flex flex-col gap-2.5">
-                                <div class="flex items-center gap-2 justify-between">
-                                    <span class="text-xs font-bold text-slate-400">趨勢</span>
-                                    <span class="text-xs font-extrabold px-2.5 py-1 rounded shadow-sm animate-fade-in"
-                                        :class="sentimentVerdict.trendBg">{{ sentimentVerdict.trend }}</span>
-                                </div>
-                                <div class="flex items-center gap-2 justify-between">
-                                    <span class="text-xs font-bold text-slate-400">建議</span>
-                                    <span class="text-xs font-extrabold px-2.5 py-1 rounded shadow-sm animate-fade-in"
-                                        :class="sentimentVerdict.actionBg">{{ sentimentVerdict.action }}</span>
-                                </div>
-                                <div class="flex items-center gap-2 justify-between">
-                                    <span class="text-xs font-bold text-slate-400">風險</span>
-                                    <span class="text-xs font-extrabold px-2.5 py-1 rounded shadow-sm animate-fade-in"
-                                        :class="sentimentVerdict.riskBg">{{ sentimentVerdict.risk }}</span>
-                                </div>
-                            </div>
-
-                            <div class="mt-2 pt-2.5 border-t border-slate-800/80">
-                                <div
-                                    class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2 text-center">
-                                    多空力道比</div>
-                                <div class="flex items-center gap-1.5 justify-center">
-                                    <span
-                                        class="text-emerald-400 font-black text-sm drop-shadow-[0_0_4px_rgba(52,211,153,0.25)]">▲
-                                        多 {{ Math.round(sentimentVerdict.bullPct) }}</span>
-                                    <span class="text-slate-500 text-[10px] font-bold">vs</span>
-                                    <span
-                                        class="text-rose-400 font-black text-sm drop-shadow-[0_0_4px_rgba(248,113,113,0.25)]">▼
-                                        空 {{ Math.round(sentimentVerdict.bearPct) }}</span>
-                                </div>
-                            </div>
-
-                            <div class="mt-1 pt-2.5 border-t border-slate-800/80">
-                                <div
-                                    class="text-[11px] font-black text-slate-300 uppercase tracking-wider mb-2 text-center">
-                                    情緒溫度</div>
-                                <div
-                                    class="relative h-2 rounded-full bg-gradient-to-r from-emerald-500 via-amber-400 to-rose-500">
-                                    <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-white border-2 shadow-md transition-all duration-700"
-                                        :class="sentimentVerdict.thermometerBorder"
-                                        :style="{ left: 'calc(' + activeMarketScore.total + '% - 6px)' }">
+                            <div class="flex-1">
+                                <h3 class="text-base font-bold text-[#5c544d] tracking-wide mb-3 flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 bg-[#8a817c] rounded-full"></span>
+                                    戰情預判：{{ aiUsInsight.title }}
+                                </h3>
+                                <div class="flex flex-col gap-4">
+                                    <div class="border-l-2 border-[#e5e0d8] pl-3">
+                                        <div class="text-[10px] font-bold text-[#8a817c] tracking-widest mb-1 uppercase">預知未來</div>
+                                        <p class="text-sm font-medium text-[#5c544d] leading-relaxed tracking-wide">
+                                            {{ aiUsInsight.future }}
+                                        </p>
                                     </div>
-                                </div>
-                                <div class="flex justify-between text-[10px] font-bold text-slate-400 mt-1.5">
-                                    <span>恐慌</span><span>中立</span><span>貪婪</span>
+                                    <div class="border-l-2 border-[#e5e0d8] pl-3">
+                                        <div class="text-[10px] font-bold text-[#8a817c] tracking-widest mb-1 uppercase">當下建議</div>
+                                        <p class="text-sm font-medium text-[#5c544d] leading-relaxed tracking-wide">
+                                            {{ aiUsInsight.action }}
+                                        </p>
+                                    </div>
+
+                                    <!-- Sentiment Gauge -->
+                                    <div class="mt-1 pt-4 border-t border-[#e5e0d8]">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <span class="text-[10px] font-bold text-[#8a817c] tracking-widest uppercase">市場情緒指標</span>
+                                            <span class="text-xs font-black mono text-[#5c544d]">{{ activeMarketScore.total }} <span class="text-[10px] text-[#8a817c] font-normal">/ 100</span></span>
+                                        </div>
+                                        <div class="relative w-full h-1.5 bg-[#e5e0d8] rounded-full overflow-hidden">
+                                            <!-- 恐慌區間背景 -->
+                                            <div class="absolute left-0 top-0 h-full w-[40%] bg-[#8b9d83]/30"></div>
+                                            <!-- 貪婪區間背景 -->
+                                            <div class="absolute right-0 top-0 h-full w-[20%] bg-[#c38d8d]/30"></div>
+                                            
+                                            <!-- 當前水位指標 -->
+                                            <div class="absolute top-0 h-full transition-all duration-700 rounded-full"
+                                                 :style="{ left: '0%', width: Math.max(activeMarketScore.total, 2) + '%' }"
+                                                 :class="activeMarketScore.total <= 40 ? 'bg-[#8b9d83]' : (activeMarketScore.total >= 80 ? 'bg-[#c38d8d]' : 'bg-[#a89f91]')">
+                                            </div>
+                                        </div>
+                                        <div class="flex justify-between text-[10px] font-medium text-[#8a817c] mt-2 tracking-widest">
+                                            <span :class="activeMarketScore.total <= 40 ? 'text-[#8b9d83] font-bold' : ''">恐慌 (0-40)</span>
+                                            <span :class="(activeMarketScore.total > 40 && activeMarketScore.total < 80) ? 'text-[#5c544d] font-bold' : ''">中立震盪</span>
+                                            <span :class="activeMarketScore.total >= 80 ? 'text-[#c38d8d] font-bold' : ''">貪婪 (80-100)</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div v-if="currentView === 'us_market'" class="flex flex-col gap-3">
 
-                    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-                        <div class="bg-gradient-to-r from-slate-800 to-slate-900 px-4 py-2.5 flex items-center gap-2">
+                    <div class="bg-[#faf9f5] border border-[#e5e0d8] rounded-lg shadow-sm overflow-hidden">
+                        <div class="bg-[#f0ebe1] px-4 py-2.5 flex items-center gap-2 border-b border-[#e5e0d8]">
                             <span class="text-sm">🏛️</span>
-                            <h3 class="text-xs font-black text-white uppercase tracking-widest">利率環境矩陣 <span
-                                    class="text-slate-400 font-bold ml-1">Macro Risk Engine</span></h3>
+                            <h3 class="text-xs font-bold text-[#5c544d] uppercase tracking-widest">利率環境矩陣 <span
+                                    class="text-[#8a817c] font-medium ml-1">Macro Risk</span></h3>
                             <div class="ml-auto flex items-center gap-2">
-                                <span class="text-[10px] font-black px-2 py-0.5 rounded border"
-                                    :class="macroRiskLevel.total >= 60 ? 'text-rose-300 border-rose-700 bg-rose-900/50 animate-pulse' : (macroRiskLevel.total >= 30 ? 'text-amber-300 border-amber-700 bg-amber-900/50' : 'text-emerald-300 border-emerald-700 bg-emerald-900/50')">
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded border border-[#d6cfc7] bg-white text-[#5c544d]">
                                     風險指數 {{ macroRiskLevel.total }}%
                                 </span>
                                 <div v-for="(warn, i) in macroRiskLevel.warnings" :key="i"
-                                    class="text-[9px] bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded border border-rose-500/30 hidden sm:block">
+                                    class="text-[9px] bg-[#fff5f5] text-[#c38d8d] px-1.5 py-0.5 rounded border border-[#fbd5d5] hidden sm:block">
                                     {{ warn }}</div>
                                 <div v-if="macroRiskLevel.warnings.length === 0"
-                                    class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-500/30 hidden sm:block">
+                                    class="text-[9px] bg-[#f0fdf4] text-[#8b9d83] px-1.5 py-0.5 rounded border border-[#dcfce7] hidden sm:block">
                                     結構穩定</div>
                             </div>
                         </div>
                         <div
-                            class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100">
-                            <div class="p-4 flex flex-col justify-between hover:bg-slate-50 transition-colors">
+                            class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#e5e0d8]">
+                            <div class="p-4 flex flex-col justify-between hover:bg-[#f0ebe1] transition-colors">
                                 <div class="flex justify-between items-start mb-2">
                                     <div>
                                         <a href="https://fred.stlouisfed.org/series/T10Y2Y" target="_blank"
-                                            class="text-sm font-black text-slate-800 hover:text-indigo-600 underline decoration-slate-300 underline-offset-2">10Y-2Y
+                                            class="text-sm font-bold text-[#5c544d] hover:text-[#8b9d83] underline decoration-[#d6cfc7] underline-offset-2">10Y-2Y
                                             利差</a>
-                                        <div class="text-[11px] text-slate-400 font-bold mt-0.5">市場衰退先行指標</div>
+                                        <div class="text-[11px] text-[#8a817c] font-medium mt-0.5">市場衰退先行指標</div>
                                     </div>
-                                    <div class="text-[11px] font-black px-2 py-0.5 rounded-full"
-                                        :class="(indices.yieldCurve || 0) >= 0 ? 'bg-emerald-100 text-emerald-700' : ((indices.yieldCurve || 0) < -1.0 ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700')">
+                                    <div class="text-[11px] font-bold px-2 py-0.5 border border-[#d6cfc7] rounded bg-white text-[#5c544d]">
                                         {{ (indices.yieldCurve || 0) >= 0 ? '多頭良性' : ((indices.yieldCurve || 0) < -1.0
                                             ? '深度倒掛' : '倒掛中' ) }} </div>
                                     </div>
                                     <div class="flex items-baseline gap-1 mb-3">
                                         <input v-model.number="indices.yieldCurve" @input="saveData" type="number"
                                             step="0.01"
-                                            class="text-4xl font-black mono w-24 p-0 bg-transparent outline-none focus:border-b-2 focus:border-indigo-400 transition-colors"
-                                            :class="(indices.yieldCurve || 0) >= 0 ? 'text-emerald-600' : ((indices.yieldCurve || 0) < -1.0 ? 'text-rose-600' : 'text-amber-500')"
+                                            class="text-4xl font-bold mono w-24 p-0 bg-transparent outline-none focus:border-b border-[#a89f91] transition-colors text-[#5c544d]"
                                             placeholder="-0.50">
-                                        <span class="text-sm font-bold text-slate-400">%</span>
+                                        <span class="text-sm font-medium text-[#8a817c]">%</span>
                                     </div>
-                                    <div class="relative w-full h-1.5 rounded-full"
-                                        style="background: linear-gradient(to right, #ef4444 0%, #f59e0b 40%, #10b981 100%);">
-                                        <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1.5 h-3.5 bg-slate-900 rounded-sm shadow border border-white transition-all duration-500"
+                                    <div class="relative w-full h-1 rounded bg-gradient-to-r from-[#c38d8d] via-[#d1bfae] to-[#8b9d83]">
+                                        <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1 h-3 bg-[#5c544d] rounded-sm transition-all duration-500"
                                             :style="{ left: Math.min(Math.max((((indices.yieldCurve || 0) + 2.0) / 5.0) * 100, 0), 100) + '%' }">
                                         </div>
                                     </div>
-                                    <div class="flex justify-between text-[10px] font-black text-slate-400 mt-1.5">
-                                        <span class="text-rose-500">-2.0 深度倒掛</span><span
-                                            class="text-slate-400">0</span><span class="text-emerald-500">+3.0
-                                            多頭良性</span>
+                                    <div class="flex justify-between text-[10px] font-medium text-[#8a817c] mt-1.5">
+                                        <span>-2.0 深度倒掛</span><span>0</span><span>+3.0 多頭良性</span>
                                     </div>
                                     <div
-                                        class="text-[9px] text-slate-400 mt-2 text-center leading-normal border-t border-slate-100 pt-1.5">
+                                        class="text-[9px] text-[#a89f91] mt-2 text-center leading-normal border-t border-[#e5e0d8] pt-1.5">
                                         倒掛後若「急速轉正」為海嘯警訊，長期維持正值則為良性多頭。
                                     </div>
                                 </div>
-                                <div class="p-4 flex flex-col justify-between hover:bg-slate-50 transition-colors">
+                                <div class="p-4 flex flex-col justify-between hover:bg-[#f0ebe1] transition-colors">
                                     <div class="flex justify-between items-start mb-2">
                                         <div>
                                             <a href="https://fred.stlouisfed.org/series/T10Y3M" target="_blank"
-                                                class="text-sm font-black text-slate-800 hover:text-indigo-600 underline decoration-slate-300 underline-offset-2">10Y-3M
+                                                class="text-sm font-bold text-[#5c544d] hover:text-[#8b9d83] underline decoration-[#d6cfc7] underline-offset-2">10Y-3M
                                                 利差</a>
-                                            <div class="text-[11px] text-slate-400 font-bold mt-0.5">聯準會官方基準</div>
+                                            <div class="text-[11px] text-[#8a817c] font-medium mt-0.5">聯準會官方基準</div>
                                         </div>
-                                        <div class="text-[11px] font-black px-2 py-0.5 rounded-full"
-                                            :class="(indices.yieldCurve3M || 0) >= 0 ? 'bg-emerald-100 text-emerald-700' : ((indices.yieldCurve3M || 0) < -1.0 ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700')">
+                                        <div class="text-[11px] font-bold px-2 py-0.5 border border-[#d6cfc7] rounded bg-white text-[#5c544d]">
                                             {{ (indices.yieldCurve3M || 0) >= 0 ? '多頭良性' : ((indices.yieldCurve3M || 0)
                                             < -1.0 ? '深度倒掛' : '倒掛中' ) }} </div>
                                         </div>
                                         <div class="flex items-baseline gap-1 mb-3">
                                             <input v-model.number="indices.yieldCurve3M" @input="saveData" type="number"
                                                 step="0.01"
-                                                class="text-4xl font-black mono w-24 p-0 bg-transparent outline-none focus:border-b-2 focus:border-indigo-400 transition-colors"
-                                                :class="(indices.yieldCurve3M || 0) >= 0 ? 'text-emerald-600' : ((indices.yieldCurve3M || 0) < -1.0 ? 'text-rose-600' : 'text-amber-500')"
+                                                class="text-4xl font-bold mono w-24 p-0 bg-transparent outline-none focus:border-b border-[#a89f91] transition-colors text-[#5c544d]"
                                                 placeholder="-0.80">
-                                            <span class="text-sm font-bold text-slate-400">%</span>
+                                            <span class="text-sm font-medium text-[#8a817c]">%</span>
                                         </div>
-                                        <div class="relative w-full h-1.5 rounded-full"
-                                            style="background: linear-gradient(to right, #ef4444 0%, #f59e0b 40%, #10b981 100%);">
-                                            <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1.5 h-3.5 bg-slate-900 rounded-sm shadow border border-white transition-all duration-500"
+                                        <div class="relative w-full h-1 rounded bg-gradient-to-r from-[#c38d8d] via-[#d1bfae] to-[#8b9d83]">
+                                            <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1 h-3 bg-[#5c544d] rounded-sm transition-all duration-500"
                                                 :style="{ left: Math.min(Math.max((((indices.yieldCurve3M || 0) + 2.0) / 5.0) * 100, 0), 100) + '%' }">
                                             </div>
                                         </div>
-                                        <div class="flex justify-between text-[10px] font-black text-slate-400 mt-1.5">
-                                            <span class="text-rose-500">-2.0 深度倒掛</span><span
-                                                class="text-slate-400">0</span><span class="text-emerald-500">+3.0
-                                                多頭良性</span>
+                                        <div class="flex justify-between text-[10px] font-medium text-[#8a817c] mt-1.5">
+                                            <span>-2.0 深度倒掛</span><span>0</span><span>+3.0 多頭良性</span>
                                         </div>
                                         <div
-                                            class="text-[9px] text-slate-400 mt-2 text-center leading-normal border-t border-slate-100 pt-1.5">
+                                            class="text-[9px] text-[#a89f91] mt-2 text-center leading-normal border-t border-[#e5e0d8] pt-1.5">
                                             倒掛後若「急速轉正」為海嘯警訊，長期維持正值則為良性多頭。
                                         </div>
                                     </div>
-                                    <div class="p-4 flex flex-col justify-between hover:bg-slate-50 transition-colors">
+                                    <div class="p-4 flex flex-col justify-between hover:bg-[#f0ebe1] transition-colors">
                                         <div class="flex justify-between items-start mb-2">
                                             <div>
                                                 <a href="https://fred.stlouisfed.org/series/DFII10" target="_blank"
-                                                    class="text-sm font-black text-slate-800 hover:text-indigo-600 underline decoration-slate-300 underline-offset-2">實質利率
+                                                    class="text-sm font-bold text-[#5c544d] hover:text-[#8b9d83] underline decoration-[#d6cfc7] underline-offset-2">實質利率
                                                     (TIPS)</a>
-                                                <div class="text-[11px] text-slate-400 font-bold mt-0.5">無風險資金成本壓力</div>
+                                                <div class="text-[11px] text-[#8a817c] font-medium mt-0.5">無風險資金成本壓力</div>
                                             </div>
-                                            <div class="text-[11px] font-black px-2 py-0.5 rounded-full"
-                                                :class="(indices.realRate || 0) > 2.0 ? 'bg-rose-100 text-rose-600' : ((indices.realRate || 0) < 0.5 ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-50 text-amber-600')">
+                                            <div class="text-[11px] font-bold px-2 py-0.5 border border-[#d6cfc7] rounded bg-white text-[#5c544d]">
                                                 {{ (indices.realRate || 0) > 2.0 ? '流動枯竭' : ((indices.realRate || 0) <
                                                     0.5 ? '資金寬鬆' : '中性' ) }} </div>
                                             </div>
                                             <div class="flex items-baseline gap-1 mb-3">
                                                 <input v-model.number="indices.realRate" @input="saveData" type="number"
                                                     step="0.01"
-                                                    class="text-4xl font-black mono w-24 p-0 bg-transparent outline-none focus:border-b-2 focus:border-indigo-400 transition-colors"
-                                                    :class="(indices.realRate || 0) > 2.0 ? 'text-rose-600' : ((indices.realRate || 0) < 0.5 ? 'text-emerald-600' : 'text-amber-500')"
+                                                    class="text-4xl font-bold mono w-24 p-0 bg-transparent outline-none focus:border-b border-[#a89f91] transition-colors text-[#5c544d]"
                                                     placeholder="1.80">
-                                                <span class="text-sm font-bold text-slate-400">%</span>
+                                                <span class="text-sm font-medium text-[#8a817c]">%</span>
                                             </div>
-                                            <div class="relative w-full h-1.5 rounded-full"
-                                                style="background: linear-gradient(to right, #10b981 0%, #f59e0b 25%, #ef4444 100%);">
-                                                <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1.5 h-3.5 bg-slate-900 rounded-sm shadow border border-white transition-all duration-500"
+                                            <div class="relative w-full h-1 rounded bg-gradient-to-r from-[#8b9d83] via-[#d1bfae] to-[#c38d8d]">
+                                                <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1 h-3 bg-[#5c544d] rounded-sm transition-all duration-500"
                                                     :style="{ left: Math.min(Math.max((((indices.realRate || 0) + 1.0) / 4.0) * 100, 0), 100) + '%' }">
                                                 </div>
                                             </div>
                                             <div
-                                                class="flex justify-between text-[10px] font-black text-slate-400 mt-1.5">
-                                                <span class="text-emerald-500">-1.0 極鬆</span><span
-                                                    class="text-slate-400">0</span><span class="text-rose-500">+3.0
-                                                    枯竭</span>
+                                                class="flex justify-between text-[10px] font-medium text-[#8a817c] mt-1.5">
+                                                <span>-1.0 極鬆</span><span>0</span><span>+3.0 枯竭</span>
                                             </div>
                                         </div>
                                     </div>
@@ -804,179 +726,157 @@
 
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     <div
-                                        class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden">
-                                        <div class="absolute top-0 left-0 w-1 h-full rounded-l-2xl"
-                                            :class="(indices.vix || 0) >= 25 ? 'bg-emerald-500' : ((indices.vix || 0) <= 15 ? 'bg-rose-500' : 'bg-amber-500')">
-                                        </div>
-                                        <div class="pl-3">
+                                        class="bg-[#faf9f5] border border-[#e5e0d8] rounded-xl p-4 transition-colors hover:bg-[#f0ebe1] relative overflow-hidden">
+                                        <div class="pl-1">
                                             <div class="flex justify-between items-start mb-3">
                                                 <div>
                                                     <a href="https://finance.yahoo.com/quote/%5EVIX/" target="_blank"
-                                                        class="text-sm font-black text-slate-800 hover:text-indigo-600">恐慌指數
+                                                        class="text-sm font-bold text-[#5c544d] hover:text-[#8b9d83] underline decoration-[#d6cfc7] underline-offset-2">恐慌指數
                                                         (VIX)</a>
-                                                    <div class="text-[11px] text-slate-400 font-bold mt-0.5">標普 500
+                                                    <div class="text-[11px] text-[#8a817c] font-medium mt-0.5">標普 500
                                                         隱含波動率</div>
                                                 </div>
-                                                <div class="text-[11px] font-black px-2.5 py-1 rounded-full"
-                                                    :class="(indices.vix || 0) >= 25 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'">
+                                                <div class="text-[11px] font-bold px-2.5 py-1 rounded border border-[#d6cfc7] bg-white text-[#5c544d]">
                                                     {{ (indices.vix || 0) >= 25 ? '恐慌買點' : '安逸過熱' }}
                                                 </div>
                                             </div>
                                             <div class="flex items-baseline gap-1 mb-3">
-                                                <div class="text-5xl font-black mono transition-colors"
-                                                    :class="(indices.vix || 0) >= 25 ? 'text-emerald-600' : ((indices.vix || 0) <= 15 ? 'text-rose-600' : 'text-amber-500')">
+                                                <div class="text-4xl font-bold mono transition-colors text-[#5c544d]">
                                                     {{ parseFloat(indices.vix || 0).toFixed(1) }}
                                                 </div>
-                                                <span class="text-base font-bold text-slate-400">pts</span>
+                                                <span class="text-sm font-medium text-[#8a817c]">pts</span>
                                             </div>
                                             <div
-                                                class="relative w-full h-1.5 rounded-full bg-gradient-to-r from-emerald-500 via-amber-400 to-rose-500">
-                                                <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1.5 h-3.5 bg-slate-900 rounded-sm shadow border border-white transition-all duration-500"
+                                                class="relative w-full h-1 rounded bg-gradient-to-r from-[#8b9d83] via-[#d1bfae] to-[#c38d8d]">
+                                                <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1 h-3 bg-[#5c544d] rounded-sm transition-all duration-500"
                                                     :style="{ left: Math.min(Math.max(((50 - (indices.vix || 0)) / 40) * 100, 0), 100) + '%' }">
                                                 </div>
                                             </div>
                                             <div
-                                                class="flex justify-between text-[10px] font-black text-slate-400 mt-1.5">
-                                                <span class="text-emerald-500">恐慌 50+</span><span>常態 20</span><span
-                                                    class="text-rose-500">安逸 10-</span>
+                                                class="flex justify-between text-[10px] font-medium text-[#8a817c] mt-1.5">
+                                                <span>恐慌 50+</span><span>常態 20</span><span>安逸 10-</span>
                                             </div>
                                         </div>
                                     </div>
                                     <div
-                                        class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden">
-                                        <div class="absolute top-0 left-0 w-1 h-full rounded-l-2xl"
-                                            :class="(indices.cnn || 50) <= 25 ? 'bg-emerald-500' : ((indices.cnn || 50) >= 75 ? 'bg-rose-500' : 'bg-amber-500')">
-                                        </div>
-                                        <div class="pl-3">
+                                        class="bg-[#faf9f5] border border-[#e5e0d8] rounded-xl p-4 transition-colors hover:bg-[#f0ebe1] relative overflow-hidden">
+                                        <div class="pl-1">
                                             <div class="flex justify-between items-start mb-3">
                                                 <div>
                                                     <a href="https://edition.cnn.com/markets/fear-and-greed"
                                                         target="_blank"
-                                                        class="text-sm font-black text-slate-800 hover:text-indigo-600">CNN
+                                                        class="text-sm font-bold text-[#5c544d] hover:text-[#8b9d83] underline decoration-[#d6cfc7] underline-offset-2">CNN
                                                         恐貪指數</a>
-                                                    <div class="text-[11px] text-slate-400 font-bold mt-0.5">Fear &amp;
+                                                    <div class="text-[11px] text-[#8a817c] font-medium mt-0.5">Fear &amp;
                                                         Greed Index</div>
                                                 </div>
-                                                <div class="text-[11px] font-black px-2.5 py-1 rounded-full"
-                                                    :class="(indices.cnn || 50) <= 25 ? 'bg-emerald-100 text-emerald-700' : ((indices.cnn || 50) >= 75 ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-600')">
+                                                <div class="text-[11px] font-bold px-2.5 py-1 rounded border border-[#d6cfc7] bg-white text-[#5c544d]">
                                                     {{ (indices.cnn || 50) <= 25 ? '極度恐慌' : ((indices.cnn || 50)>= 75 ?
                                                         '極度貪婪' : '中立') }}
                                                 </div>
                                             </div>
                                             <div class="flex items-baseline gap-1 mb-3">
                                                 <input v-model.number="indices.cnn" @input="saveData" type="number"
-                                                    class="text-5xl font-black mono w-20 p-0 bg-transparent outline-none focus:border-b-2 focus:border-indigo-400 transition-colors"
-                                                    :class="(indices.cnn || 50) >= 75 ? 'text-rose-600' : ((indices.cnn || 50) <= 25 ? 'text-emerald-600' : 'text-amber-500')"
+                                                    class="text-4xl font-bold mono w-20 p-0 bg-transparent outline-none focus:border-b border-[#a89f91] transition-colors text-[#5c544d]"
                                                     placeholder="50">
-                                                <span class="text-base font-bold text-slate-400">/ 100</span>
+                                                <span class="text-sm font-medium text-[#8a817c]">/ 100</span>
                                             </div>
                                             <div
-                                                class="relative w-full h-1.5 rounded-full bg-gradient-to-r from-emerald-500 via-amber-400 to-rose-500">
-                                                <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1.5 h-3.5 bg-slate-900 rounded-sm shadow border border-white transition-all duration-500"
+                                                class="relative w-full h-1 rounded bg-gradient-to-r from-[#8b9d83] via-[#d1bfae] to-[#c38d8d]">
+                                                <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1 h-3 bg-[#5c544d] rounded-sm transition-all duration-500"
                                                     :style="{ left: Math.min(Math.max(indices.cnn || 0, 0), 100) + '%' }">
                                                 </div>
                                             </div>
                                             <div
-                                                class="flex justify-between text-[10px] font-black text-slate-400 mt-1.5">
-                                                <span class="text-emerald-500">極恐慌 0</span><span>中立 50</span><span
-                                                    class="text-rose-500">極貪婪 100</span>
+                                                class="flex justify-between text-[10px] font-medium text-[#8a817c] mt-1.5">
+                                                <span>極恐慌 0</span><span>中立 50</span><span>極貪婪 100</span>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div
-                                        class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden">
-                                        <div class="absolute top-0 left-0 w-1 h-full rounded-l-2xl bg-indigo-500"></div>
-                                        <div class="pl-3">
+                                        class="bg-[#faf9f5] border border-[#e5e0d8] rounded-xl p-4 transition-colors hover:bg-[#f0ebe1] relative overflow-hidden">
+                                        <div class="pl-1">
                                             <div class="flex justify-between items-start mb-2">
                                                 <div>
                                                     <a href="https://finance.yahoo.com/quote/QQQ" target="_blank"
-                                                        class="text-sm font-black text-slate-800 hover:text-indigo-600">納斯達克
+                                                        class="text-sm font-bold text-[#5c544d] hover:text-[#8b9d83] underline decoration-[#d6cfc7] underline-offset-2">納斯達克
                                                         (QQQ) · 60MA乖離</a>
-                                                    <div class="text-[11px] text-slate-400 font-bold mt-0.5">美國科技股實體價格動能
+                                                    <div class="text-[11px] text-[#8a817c] font-medium mt-0.5">美國科技股實體價格動能
                                                     </div>
                                                 </div>
                                                 <div class="flex items-center gap-1.5">
                                                     <span
-                                                        class="text-[10px] font-black bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded-full border border-indigo-100">WT:
+                                                        class="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#d6cfc7] bg-[#f0ebe1] text-[#8a817c]">WT:
                                                         25%</span>
-                                                    <div class="text-[10px] font-black px-2 py-0.5 rounded-full"
-                                                        :class="parseFloat(indices.qqqBias || 0) >= 10 ? 'bg-rose-100 text-rose-700' : (parseFloat(indices.qqqBias || 0) <= -8 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600')">
+                                                    <div class="text-[11px] font-bold px-2 py-0.5 rounded border border-[#d6cfc7] bg-white text-[#5c544d]">
                                                         {{ parseFloat(indices.qqqBias || 0) >= 10 ? '嚴重過熱' :
                                                         (parseFloat(indices.qqqBias || 0) <= -8 ? '恐慌超跌' : '中性震盪' ) }}
-                                                            </div>
                                                     </div>
                                                 </div>
-                                                <div class="flex items-baseline gap-1 mb-3">
-                                                    <input v-model.number="indices.qqqBias" @input="saveData"
-                                                        type="number" step="0.1"
-                                                        class="text-4xl font-black mono w-24 p-0 bg-transparent outline-none focus:border-b-2 focus:border-indigo-400 transition-colors"
-                                                        :class="parseFloat(indices.qqqBias || 0) >= 10 ? 'text-rose-600' : (parseFloat(indices.qqqBias || 0) <= -8 ? 'text-emerald-600' : 'text-amber-500')"
-                                                        placeholder="0.0">
-                                                    <span class="text-xs font-bold text-slate-400">%</span>
+                                            </div>
+                                            <div class="flex items-baseline gap-1 mb-3">
+                                                <input v-model.number="indices.qqqBias" @input="saveData"
+                                                    type="number" step="0.1"
+                                                    class="text-4xl font-bold mono w-24 p-0 bg-transparent outline-none focus:border-b border-[#a89f91] transition-colors text-[#5c544d]"
+                                                    placeholder="0.0">
+                                                <span class="text-xs font-medium text-[#8a817c]">%</span>
+                                            </div>
+                                            <div
+                                                class="relative w-full h-1 rounded bg-gradient-to-r from-[#8b9d83] via-[#d1bfae] to-[#c38d8d]">
+                                                <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1 h-3 bg-[#5c544d] rounded-sm transition-all duration-500"
+                                                    :style="{ left: Math.min(Math.max(((parseFloat(indices.qqqBias || 0) + 8) / 20) * 100, 0), 100) + '%' }">
                                                 </div>
-                                                <div
-                                                    class="relative w-full h-1.5 rounded-full bg-gradient-to-r from-emerald-500 via-amber-400 to-rose-500">
-                                                    <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1.5 h-3.5 bg-slate-900 rounded-sm shadow border border-white transition-all duration-500"
-                                                        :style="{ left: Math.min(Math.max(((parseFloat(indices.qqqBias || 0) + 8) / 20) * 100, 0), 100) + '%' }">
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    class="flex justify-between text-[10px] font-black text-slate-400 mt-1.5">
-                                                    <span class="text-emerald-500">超跌 -8%</span><span
-                                                        class="text-slate-400">0%</span><span class="text-rose-500">過熱
-                                                        +12%</span>
-                                                </div>
+                                            </div>
+                                            <div
+                                                class="flex justify-between text-[10px] font-medium text-[#8a817c] mt-1.5">
+                                                <span>超跌 -8%</span><span>0%</span><span>過熱
+                                                    +12%</span>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <div
-                                            class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden">
-                                            <div class="absolute top-0 left-0 w-1 h-full rounded-l-2xl bg-cyan-500">
-                                            </div>
-                                            <div class="pl-3">
-                                                <div class="flex justify-between items-start mb-2">
-                                                    <div>
-                                                        <a href="https://finance.yahoo.com/quote/DX-Y.NYB"
-                                                            target="_blank"
-                                                            class="text-sm font-black text-slate-800 hover:text-cyan-600">美元指數
-                                                            (DXY) · 60MA乖離</a>
-                                                        <div class="text-[11px] text-slate-400 font-bold mt-0.5">
-                                                            全球熱錢避險情緒</div>
-                                                    </div>
-                                                    <div class="flex items-center gap-1.5">
-                                                        <span
-                                                            class="text-[10px] font-black bg-cyan-50 text-cyan-600 px-1.5 py-0.5 rounded-full border border-cyan-100">WT:
-                                                            20%</span>
-                                                        <div class="text-[10px] font-black px-2 py-0.5 rounded-full"
-                                                            :class="parseFloat(indices.dxyBias || 0) >= 3 ? 'bg-rose-100 text-rose-700' : (parseFloat(indices.dxyBias || 0) <= -3 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600')">
-                                                            {{ parseFloat(indices.dxyBias || 0) >= 3 ? '資金緊縮' :
-                                                            (parseFloat(indices.dxyBias || 0) <= -3 ? '資金寬鬆' : '中性震盪' )
-                                                                }} </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex items-baseline gap-1 mb-3">
-                                                        <input v-model.number="indices.dxyBias" @input="saveData"
-                                                            type="number" step="0.1"
-                                                            class="text-4xl font-black mono w-24 p-0 bg-transparent outline-none focus:border-b-2 focus:border-cyan-400 transition-colors"
-                                                            :class="parseFloat(indices.dxyBias || 0) >= 3 ? 'text-rose-600' : (parseFloat(indices.dxyBias || 0) <= -3 ? 'text-emerald-600' : 'text-amber-500')"
-                                                            placeholder="0.0">
-                                                        <span class="text-xs font-bold text-slate-400">%</span>
-                                                    </div>
-                                                    <div
-                                                        class="relative w-full h-1.5 rounded-full bg-gradient-to-r from-emerald-500 via-amber-400 to-rose-500">
-                                                        <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1.5 h-3.5 bg-slate-900 rounded-sm shadow border border-white transition-all duration-500"
-                                                            :style="{ left: Math.min(Math.max(((parseFloat(indices.dxyBias || 0) + 3) / 6) * 100, 0), 100) + '%' }">
-                                                        </div>
-                                                    </div>
-                                                    <div
-                                                        class="flex justify-between text-[10px] font-black text-slate-400 mt-1.5">
-                                                        <span class="text-emerald-500">寬鬆 -3%</span><span
-                                                            class="text-slate-400">0%</span><span
-                                                            class="text-rose-500">緊縮 +3%</span>
-                                                    </div>
+                                    <div
+                                        class="bg-[#faf9f5] border border-[#e5e0d8] rounded-xl p-4 transition-colors hover:bg-[#f0ebe1] relative overflow-hidden">
+                                        <div class="pl-1">
+                                            <div class="flex justify-between items-start mb-2">
+                                                <div>
+                                                    <a href="https://finance.yahoo.com/quote/DX-Y.NYB"
+                                                        target="_blank"
+                                                        class="text-sm font-bold text-[#5c544d] hover:text-[#8b9d83] underline decoration-[#d6cfc7] underline-offset-2">美元指數
+                                                        (DXY) · 60MA乖離</a>
+                                                    <div class="text-[11px] text-[#8a817c] font-medium mt-0.5">
+                                                        全球熱錢避險情緒</div>
+                                                </div>
+                                                <div class="flex items-center gap-1.5">
+                                                    <span
+                                                        class="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#d6cfc7] bg-[#f0ebe1] text-[#8a817c]">WT:
+                                                        20%</span>
+                                                    <div class="text-[11px] font-bold px-2 py-0.5 rounded border border-[#d6cfc7] bg-white text-[#5c544d]">
+                                                        {{ parseFloat(indices.dxyBias || 0) >= 3 ? '資金緊縮' :
+                                                        (parseFloat(indices.dxyBias || 0) <= -3 ? '資金寬鬆' : '中性震盪' )
+                                                            }} </div>
                                                 </div>
                                             </div>
+                                            <div class="flex items-baseline gap-1 mb-3">
+                                                <input v-model.number="indices.dxyBias" @input="saveData"
+                                                    type="number" step="0.1"
+                                                    class="text-4xl font-bold mono w-24 p-0 bg-transparent outline-none focus:border-b border-[#a89f91] transition-colors text-[#5c544d]"
+                                                    placeholder="0.0">
+                                                <span class="text-xs font-medium text-[#8a817c]">%</span>
+                                            </div>
+                                            <div
+                                                class="relative w-full h-1 rounded bg-gradient-to-r from-[#8b9d83] via-[#d1bfae] to-[#c38d8d]">
+                                                <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1 h-3 bg-[#5c544d] rounded-sm transition-all duration-500"
+                                                    :style="{ left: Math.min(Math.max(((parseFloat(indices.dxyBias || 0) + 3) / 6) * 100, 0), 100) + '%' }">
+                                                </div>
+                                            </div>
+                                            <div
+                                                class="flex justify-between text-[10px] font-medium text-[#8a817c] mt-1.5">
+                                                <span>寬鬆 -3%</span><span>0%</span><span>緊縮 +3%</span>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                         </div>
                                     </div>
@@ -984,53 +884,53 @@
                                     <div v-if="currentView === 'tw_market'" class="flex flex-col gap-3">
                                         
                                         <!-- AI Insight Center (MUJI Style) -->
-                                        <div class="bg-white border border-stone-200 p-5 rounded-sm relative transition-all duration-300">
+                                        <div class="bg-[#faf9f5] border border-[#e5e0d8] p-5 rounded-xl relative transition-all duration-300">
                                             <div class="flex items-start gap-4 relative z-10">
-                                                <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center text-sm font-medium tracking-widest border"
+                                                <div class="flex-shrink-0 w-10 h-10 flex items-center justify-center text-sm font-medium tracking-widest border rounded"
                                                      :class="aiTaiwanInsight.iconTheme">
                                                     {{ aiTaiwanInsight.emoji }}
                                                 </div>
                                                 <div class="flex-1">
-                                                    <h3 class="text-base font-medium text-stone-800 tracking-wide mb-3 flex items-center gap-2">
-                                                        <span class="w-1.5 h-1.5 bg-stone-400 rounded-full"></span>
+                                                    <h3 class="text-base font-bold text-[#5c544d] tracking-wide mb-3 flex items-center gap-2">
+                                                        <span class="w-1.5 h-1.5 bg-[#8a817c] rounded-full"></span>
                                                         戰情預判：{{ aiTaiwanInsight.title }}
                                                     </h3>
                                                     <div class="flex flex-col gap-4">
-                                                        <div class="border-l-2 border-stone-200 pl-3">
-                                                            <div class="text-[10px] font-bold text-stone-400 tracking-widest mb-1 uppercase">預知未來</div>
-                                                            <p class="text-sm font-medium text-stone-600 leading-relaxed tracking-wide">
+                                                        <div class="border-l-2 border-[#e5e0d8] pl-3">
+                                                            <div class="text-[10px] font-bold text-[#8a817c] tracking-widest mb-1 uppercase">預知未來</div>
+                                                            <p class="text-sm font-medium text-[#5c544d] leading-relaxed tracking-wide">
                                                                 {{ aiTaiwanInsight.future }}
                                                             </p>
                                                         </div>
-                                                        <div class="border-l-2 border-stone-200 pl-3">
-                                                            <div class="text-[10px] font-bold text-stone-400 tracking-widest mb-1 uppercase">當下建議</div>
-                                                            <p class="text-sm font-medium text-stone-600 leading-relaxed tracking-wide">
+                                                        <div class="border-l-2 border-[#e5e0d8] pl-3">
+                                                            <div class="text-[10px] font-bold text-[#8a817c] tracking-widest mb-1 uppercase">當下建議</div>
+                                                            <p class="text-sm font-medium text-[#5c544d] leading-relaxed tracking-wide">
                                                                 {{ aiTaiwanInsight.action }}
                                                             </p>
                                                         </div>
                                                         
                                                         <!-- Sentiment Gauge -->
-                                                        <div class="mt-1 pt-4 border-t border-stone-100">
+                                                        <div class="mt-1 pt-4 border-t border-[#e5e0d8]">
                                                             <div class="flex justify-between items-center mb-2">
-                                                                <span class="text-[10px] font-bold text-stone-500 tracking-widest uppercase">市場情緒指標</span>
-                                                                <span class="text-xs font-black mono text-stone-700">{{ twMarketScore.total }} <span class="text-[10px] text-stone-400 font-normal">/ 100</span></span>
+                                                                <span class="text-[10px] font-bold text-[#8a817c] tracking-widest uppercase">市場情緒指標</span>
+                                                                <span class="text-xs font-black mono text-[#5c544d]">{{ twMarketScore.total }} <span class="text-[10px] text-[#8a817c] font-normal">/ 100</span></span>
                                                             </div>
-                                                            <div class="relative w-full h-1.5 bg-stone-100 rounded-full overflow-hidden">
+                                                            <div class="relative w-full h-1.5 bg-[#e5e0d8] rounded-full overflow-hidden">
                                                                 <!-- 恐慌區間背景 -->
-                                                                <div class="absolute left-0 top-0 h-full w-[30%] bg-stone-200/60"></div>
+                                                                <div class="absolute left-0 top-0 h-full w-[30%] bg-[#8b9d83]/30"></div>
                                                                 <!-- 貪婪區間背景 -->
-                                                                <div class="absolute right-0 top-0 h-full w-[30%] bg-stone-200/60"></div>
+                                                                <div class="absolute right-0 top-0 h-full w-[30%] bg-[#c38d8d]/30"></div>
                                                                 
                                                                 <!-- 當前水位指標 -->
                                                                 <div class="absolute top-0 h-full transition-all duration-700 rounded-full"
                                                                      :style="{ left: '0%', width: Math.max(twMarketScore.total, 2) + '%' }"
-                                                                     :class="twMarketScore.total <= 30 ? 'bg-stone-700' : (twMarketScore.total >= 70 ? 'bg-stone-700' : 'bg-stone-300')">
+                                                                     :class="twMarketScore.total <= 30 ? 'bg-[#8b9d83]' : (twMarketScore.total >= 70 ? 'bg-[#c38d8d]' : 'bg-[#a89f91]')">
                                                                 </div>
                                                             </div>
-                                                            <div class="flex justify-between text-[10px] font-medium text-stone-400 mt-2 tracking-widest">
-                                                                <span :class="twMarketScore.total <= 30 ? 'text-stone-700 font-bold' : ''">極度恐慌 (0-30)</span>
-                                                                <span :class="(twMarketScore.total > 30 && twMarketScore.total < 70) ? 'text-stone-700 font-bold' : ''">中立</span>
-                                                                <span :class="twMarketScore.total >= 70 ? 'text-stone-700 font-bold' : ''">極度貪婪 (70-100)</span>
+                                                            <div class="flex justify-between text-[10px] font-medium text-[#8a817c] mt-2 tracking-widest">
+                                                                <span :class="twMarketScore.total <= 30 ? 'text-[#8b9d83] font-bold' : ''">極度恐慌 (0-30)</span>
+                                                                <span :class="(twMarketScore.total > 30 && twMarketScore.total < 70) ? 'text-[#5c544d] font-bold' : ''">中立</span>
+                                                                <span :class="twMarketScore.total >= 70 ? 'text-[#c38d8d] font-bold' : ''">極度貪婪 (70-100)</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1040,98 +940,106 @@
 
                                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <!-- Bias Card -->
-                                            <div class="bg-white border border-stone-200 p-5 rounded-sm flex flex-col justify-between relative group">
-                                                <div class="flex justify-between items-start mb-4">
-                                                    <div>
-                                                        <a href="https://finance.yahoo.com/quote/0050.TW/" target="_blank" class="text-xs font-bold text-stone-500 tracking-widest hover:text-stone-800 transition-colors">0050 · 60MA乖離</a>
+                                            <div class="bg-[#faf9f5] border border-[#e5e0d8] rounded-xl p-4 transition-colors hover:bg-[#f0ebe1] relative overflow-hidden">
+                                                <div class="pl-1">
+                                                    <div class="flex justify-between items-start mb-2">
+                                                        <div>
+                                                            <a href="https://finance.yahoo.com/quote/0050.TW/" target="_blank" class="text-xs font-bold text-[#5c544d] tracking-widest hover:text-[#8b9d83] transition-colors">0050 · 60MA乖離</a>
+                                                        </div>
+                                                        <button v-if="manualBias !== null" @click="manualBias = null" class="text-[10px] text-[#8a817c] hover:text-[#5c544d] tracking-wider">重置</button>
                                                     </div>
-                                                    <button v-if="manualBias !== null" @click="manualBias = null" class="text-[10px] text-stone-400 hover:text-stone-600 tracking-wider">重置</button>
-                                                </div>
-                                                <div class="flex items-baseline mb-4">
-                                                    <input v-model.number="manualBias" type="number"
-                                                        class="text-3xl font-medium text-stone-700 bg-transparent outline-none transition-colors w-24 p-0"
-                                                        :placeholder="parseFloat(biasIndex || 0).toFixed(1)">
-                                                    <span class="text-sm font-medium text-stone-400 ml-1">%</span>
-                                                </div>
-                                                <div class="relative w-full h-1 rounded-full bg-stone-100">
-                                                    <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1.5 h-3 bg-stone-500 rounded-sm transition-all duration-500"
-                                                        :style="{ left: Math.min(Math.max(((parseFloat(displayBias || 0) + 12) / 30) * 100, 0), 100) + '%' }">
+                                                    <div class="flex items-baseline mb-3 gap-1">
+                                                        <input v-model.number="manualBias" type="number"
+                                                            class="text-4xl font-bold mono w-24 p-0 bg-transparent outline-none focus:border-b border-[#a89f91] transition-colors text-[#5c544d]"
+                                                            :placeholder="parseFloat(biasIndex || 0).toFixed(1)">
+                                                        <span class="text-sm font-medium text-[#8a817c] ml-1">%</span>
                                                     </div>
-                                                </div>
-                                                <div class="flex justify-between text-[10px] font-medium text-stone-400 mt-2 tracking-widest">
-                                                    <span>超跌</span><span>中立</span><span>過熱</span>
+                                                    <div class="relative w-full h-1 rounded bg-gradient-to-r from-[#8b9d83] via-[#d1bfae] to-[#c38d8d]">
+                                                        <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1 h-3 bg-[#5c544d] rounded-sm transition-all duration-500"
+                                                            :style="{ left: Math.min(Math.max(((parseFloat(displayBias || 0) + 12) / 30) * 100, 0), 100) + '%' }">
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex justify-between text-[10px] font-medium text-[#8a817c] mt-1.5 tracking-widest">
+                                                        <span>超跌</span><span>中立</span><span>過熱</span>
+                                                    </div>
                                                 </div>
                                             </div>
 
                                             <!-- Volume Card -->
-                                            <div class="bg-white border border-stone-200 p-5 rounded-sm flex flex-col justify-between relative group">
-                                                <div class="flex justify-between items-start mb-4">
-                                                    <div>
-                                                        <a href="https://finance.yahoo.com/quote/0050.TW/" target="_blank" class="text-xs font-bold text-stone-500 tracking-widest hover:text-stone-800 transition-colors">0050 · 量能熱度</a>
+                                            <div class="bg-[#faf9f5] border border-[#e5e0d8] rounded-xl p-4 transition-colors hover:bg-[#f0ebe1] relative overflow-hidden">
+                                                <div class="pl-1">
+                                                    <div class="flex justify-between items-start mb-2">
+                                                        <div>
+                                                            <a href="https://finance.yahoo.com/quote/0050.TW/" target="_blank" class="text-xs font-bold text-[#5c544d] tracking-widest hover:text-[#8b9d83] transition-colors">0050 · 量能熱度</a>
+                                                        </div>
+                                                        <span class="text-[10px] text-[#8a817c] tracking-wider">最新量: {{ Math.round((indices.volume0050Latest || 0) / 1000).toLocaleString() }}張</span>
                                                     </div>
-                                                    <span class="text-[10px] text-stone-400 tracking-wider">最新量: {{ Math.round((indices.volume0050Latest || 0) / 1000).toLocaleString() }}張</span>
-                                                </div>
-                                                <div class="flex items-baseline mb-4">
-                                                    <div class="text-3xl font-medium text-stone-700 transition-colors">
-                                                        {{ indices.volume0050Ratio || 100 }}
+                                                    <div class="flex items-baseline mb-3 gap-1">
+                                                        <div class="text-4xl font-bold mono text-[#5c544d] transition-colors">
+                                                            {{ indices.volume0050Ratio || 100 }}
+                                                        </div>
+                                                        <span class="text-sm font-medium text-[#8a817c] ml-1">%</span>
                                                     </div>
-                                                    <span class="text-sm font-medium text-stone-400 ml-1">%</span>
-                                                </div>
-                                                <div class="relative w-full h-1 rounded-full bg-stone-100">
-                                                    <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1.5 h-3 bg-stone-500 rounded-sm transition-all duration-500"
-                                                        :style="{ left: Math.min(Math.max((((indices.volume0050Ratio || 100) - 40) / 210) * 100, 0), 100) + '%' }">
+                                                    <div class="relative w-full h-1 rounded bg-gradient-to-r from-[#8b9d83] via-[#d1bfae] to-[#c38d8d]">
+                                                        <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1 h-3 bg-[#5c544d] rounded-sm transition-all duration-500"
+                                                            :style="{ left: Math.min(Math.max((((indices.volume0050Ratio || 100) - 40) / 210) * 100, 0), 100) + '%' }">
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="flex justify-between text-[10px] font-medium text-stone-400 mt-2 tracking-widest">
-                                                    <span>量縮</span><span>均量</span><span>爆量</span>
+                                                    <div class="flex justify-between text-[10px] font-medium text-[#8a817c] mt-1.5 tracking-widest">
+                                                        <span>量縮</span><span>均量</span><span>爆量</span>
+                                                    </div>
                                                 </div>
                                             </div>
 
                                             <!-- USD/TWD Card -->
-                                            <div class="bg-white border border-stone-200 p-5 rounded-sm flex flex-col justify-between relative group">
-                                                <div class="flex justify-between items-start mb-4">
-                                                    <div>
-                                                        <a href="https://finance.yahoo.com/quote/TWD=X/" target="_blank" class="text-xs font-bold text-stone-500 tracking-widest hover:text-stone-800 transition-colors">USD/TWD · 60MA乖離</a>
+                                            <div class="bg-[#faf9f5] border border-[#e5e0d8] rounded-xl p-4 transition-colors hover:bg-[#f0ebe1] relative overflow-hidden">
+                                                <div class="pl-1">
+                                                    <div class="flex justify-between items-start mb-2">
+                                                        <div>
+                                                            <a href="https://finance.yahoo.com/quote/TWD=X/" target="_blank" class="text-xs font-bold text-[#5c544d] tracking-widest hover:text-[#8b9d83] transition-colors">USD/TWD · 60MA乖離</a>
+                                                        </div>
+                                                        <span class="text-[10px] text-[#8a817c] tracking-wider">匯率: {{ usdtwdRate ? usdtwdRate.toFixed(2) : '32.5' }}</span>
                                                     </div>
-                                                    <span class="text-[10px] text-stone-400 tracking-wider">匯率: {{ usdtwdRate ? usdtwdRate.toFixed(2) : '32.5' }}</span>
-                                                </div>
-                                                <div class="flex items-baseline mb-4">
-                                                    <input v-model.number="indices.usdtwdBias" type="number" readonly
-                                                        class="text-3xl font-medium text-stone-700 bg-transparent outline-none transition-colors w-24 p-0"
-                                                        :placeholder="parseFloat(indices.usdtwdBias || 0).toFixed(2)">
-                                                    <span class="text-sm font-medium text-stone-400 ml-1">%</span>
-                                                </div>
-                                                <div class="relative w-full h-1 rounded-full bg-stone-100">
-                                                    <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1.5 h-3 bg-stone-500 rounded-sm transition-all duration-500"
-                                                        :style="{ left: Math.min(Math.max(((parseFloat(indices.usdtwdBias || 0) + 3) / 6) * 100, 0), 100) + '%' }">
+                                                    <div class="flex items-baseline mb-3 gap-1">
+                                                        <input v-model.number="indices.usdtwdBias" type="number" readonly
+                                                            class="text-4xl font-bold mono w-24 p-0 bg-transparent outline-none focus:border-b border-[#a89f91] transition-colors text-[#5c544d]"
+                                                            :placeholder="parseFloat(indices.usdtwdBias || 0).toFixed(2)">
+                                                        <span class="text-sm font-medium text-[#8a817c] ml-1">%</span>
                                                     </div>
-                                                </div>
-                                                <div class="flex justify-between text-[10px] font-medium text-stone-400 mt-2 tracking-widest">
-                                                    <span>強升</span><span>平穩</span><span>重貶</span>
+                                                    <div class="relative w-full h-1 rounded bg-gradient-to-r from-[#8b9d83] via-[#d1bfae] to-[#c38d8d]">
+                                                        <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1 h-3 bg-[#5c544d] rounded-sm transition-all duration-500"
+                                                            :style="{ left: Math.min(Math.max(((parseFloat(indices.usdtwdBias || 0) + 3) / 6) * 100, 0), 100) + '%' }">
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex justify-between text-[10px] font-medium text-[#8a817c] mt-1.5 tracking-widest">
+                                                        <span>強升</span><span>平穩</span><span>重貶</span>
+                                                    </div>
                                                 </div>
                                             </div>
 
                                             <!-- Institutional Card -->
-                                            <div class="bg-white border border-stone-200 p-5 rounded-sm flex flex-col justify-between relative group">
-                                                <div class="flex justify-between items-start mb-4">
-                                                    <div>
-                                                        <span class="text-xs font-bold text-stone-500 tracking-widest">三大法人買賣超</span>
+                                            <div class="bg-[#faf9f5] border border-[#e5e0d8] rounded-xl p-4 transition-colors hover:bg-[#f0ebe1] relative overflow-hidden">
+                                                <div class="pl-1">
+                                                    <div class="flex justify-between items-start mb-2">
+                                                        <div>
+                                                            <span class="text-xs font-bold text-[#5c544d] tracking-widest">三大法人買賣超</span>
+                                                        </div>
+                                                        <span class="text-[10px] text-[#8a817c] tracking-wider">{{ formatDateString(indices.institutionalDate) || '等待更新' }}</span>
                                                     </div>
-                                                    <span class="text-[10px] text-stone-400 tracking-wider">{{ formatDateString(indices.institutionalDate) || '等待更新' }}</span>
-                                                </div>
-                                                <div class="flex items-baseline mb-4">
-                                                    <div class="text-3xl font-medium text-stone-700 transition-colors">
-                                                        {{ (indices.institutionalTotal || 0) >= 0 ? '+' : '' }}{{ (indices.institutionalTotal || 0).toFixed(0) }}
+                                                    <div class="flex items-baseline mb-3 gap-1">
+                                                        <div class="text-4xl font-bold mono text-[#5c544d] transition-colors">
+                                                            {{ (indices.institutionalTotal || 0) >= 0 ? '+' : '' }}{{ (indices.institutionalTotal || 0).toFixed(0) }}
+                                                        </div>
+                                                        <span class="text-sm font-medium text-[#8a817c] ml-1">億</span>
                                                     </div>
-                                                    <span class="text-sm font-medium text-stone-400 ml-1">億</span>
-                                                </div>
-                                                <div class="relative w-full h-1 rounded-full bg-stone-100">
-                                                    <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1.5 h-3 bg-stone-500 rounded-sm transition-all duration-500"
-                                                        :style="{ left: Math.min(Math.max((((indices.institutionalTotal || 0) + 300) / 600) * 100, 0), 100) + '%' }">
+                                                    <div class="relative w-full h-1 rounded bg-gradient-to-r from-[#c38d8d] via-[#d1bfae] to-[#8b9d83]">
+                                                        <div class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-1 h-3 bg-[#5c544d] rounded-sm transition-all duration-500"
+                                                            :style="{ left: Math.min(Math.max((((indices.institutionalTotal || 0) + 300) / 600) * 100, 0), 100) + '%' }">
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="flex justify-between text-[10px] font-medium text-stone-400 mt-2 tracking-widest">
-                                                    <span>賣超</span><span>中立</span><span>買超</span>
+                                                    <div class="flex justify-between text-[10px] font-medium text-[#8a817c] mt-1.5 tracking-widest">
+                                                        <span>賣超</span><span>中立</span><span>買超</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -2875,85 +2783,81 @@
                                                 <div class="flex items-center gap-3 pb-3 border-b border-slate-100">
                                                     <span class="text-2xl">🧮</span>
                                                     <div>
-                                                        <h3 class="text-base font-black text-slate-800">多空計分與互動模擬器</h3>
-                                                        <p class="text-[10px] text-slate-400 font-bold">Scoring Model &
-                                                            Interactive Simulator</p>
+                                                        <h3 class="text-base font-black text-slate-800">多空計分與情緒判定邏輯</h3>
+                                                        <p class="text-[10px] text-slate-400 font-bold">Scoring Model & Sentiment Logic</p>
                                                     </div>
                                                 </div>
 
-                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    <div
-                                                        class="p-4 bg-slate-900 text-slate-100 rounded-xl font-mono text-[10px] leading-relaxed flex flex-col justify-between">
-                                                        <div>
-                                                            <span
-                                                                class="text-violet-400 font-black text-[11px] block mb-1">⚖️
-                                                                多空力道比換算</span>
-                                                            空頭比例 % = Math.max(2, Math.min(98, 情緒溫度總分))<br>
-                                                            多頭比例 % = 100 - 空頭比例
+                                                <div class="flex flex-col gap-4">
+                                                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 text-xs leading-relaxed">
+                                                        <div class="font-black text-indigo-700 mb-2 border-b border-indigo-100 pb-2 flex items-center gap-2">
+                                                            <span class="text-base">🦅</span> 美股情緒模型 (US Market Momentum)
                                                         </div>
-                                                        <span
-                                                            class="text-slate-500 text-[9px] mt-2 block border-t border-slate-800 pt-1.5">總分越高則空方力道越強；總分越低則多方越強。</span>
-                                                    </div>
-                                                    <div
-                                                        class="p-4 bg-slate-900 text-slate-100 rounded-xl font-mono text-[10px] leading-relaxed flex flex-col justify-between">
-                                                        <div>
-                                                            <span
-                                                                class="text-violet-400 font-black text-[11px] block mb-1">📊
-                                                                AI 智能雙軌模型</span>
-                                                            * <strong>🦅 美股 / 總經視角</strong>: VIX恐慌(35%) + QQQ乖離(25%) +
-                                                            CNN情緒(20%) + DXY美元(20%)，純粹捕捉華爾街動能。<br>
-                                                            * <strong>🐳 台股 / 籌碼視角</strong>: 法人買賣超(35%) + 0050成交熱度(30%) + 0050乖離(20%) + 匯率乖離(15%)。<br>
-                                                            <span class="text-violet-300 font-bold ml-4">↳ 情緒區間判定：極度恐慌 (0-30) / 中立觀望 (30-70) / 極度貪婪 (70-100)</span>
-                                                        </div>
-                                                        <span
-                                                            class="text-slate-500 text-[9px] mt-2 block border-t border-slate-800 pt-1.5 flex flex-col gap-1">
-                                                            <span>💡 系統會依您切換的視圖，自動套用對應的評分引擎。</span>
-                                                            <span class="text-rose-400 font-bold">⚠️ 當上方 Macro Risk
-                                                                (利率環境) 惡化時，將無條件覆寫觸發避險！</span>
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                                <div
-                                                    class="p-5 bg-slate-50 rounded-2xl border border-slate-200/80 flex flex-col gap-4 mt-2">
-                                                    <div class="flex justify-between items-center">
-                                                        <span
-                                                            class="text-xs font-black text-slate-700 flex items-center gap-1.5">🕹️
-                                                            實時多空比例模擬器</span>
-                                                        <span
-                                                            class="text-[10px] font-bold px-2 py-0.5 rounded bg-violet-100 text-violet-700">動態響應</span>
-                                                    </div>
-
-                                                    <div class="flex flex-col gap-1.5 mt-1">
-                                                        <div
-                                                            class="flex justify-between items-center text-[10px] text-slate-500 font-black">
-                                                            <span>恐慌 (做多)</span>
-                                                            <span
-                                                                class="text-sm font-black text-violet-600 bg-violet-100/50 px-2 py-0.5 rounded-md mono">模擬分數:
-                                                                {{ simulatedScore }}</span>
-                                                            <span>貪婪 (做空)</span>
-                                                        </div>
-                                                        <input type="range" v-model.number="simulatedScore" min="0"
-                                                            max="100"
-                                                            class="w-full h-2 bg-gradient-to-r from-emerald-500 via-amber-400 to-rose-500 rounded-lg appearance-none cursor-pointer accent-violet-600 focus:outline-none">
-                                                    </div>
-
-                                                    <div class="flex flex-col gap-1.5">
-                                                        <div
-                                                            class="flex justify-between text-[10px] font-black text-slate-500">
-                                                            <span class="text-emerald-500">▲ 多頭: {{ 100 - Math.max(2,
-                                                                Math.min(98, simulatedScore)) }}%</span>
-                                                            <span class="text-rose-500">▼ 空頭: {{ Math.max(2,
-                                                                Math.min(98,
-                                                                simulatedScore)) }}%</span>
-                                                        </div>
-                                                        <div
-                                                            class="w-full h-3 bg-slate-200 rounded-full overflow-hidden flex">
-                                                            <div class="bg-emerald-500 transition-all duration-300"
-                                                                :style="{ width: (100 - Math.max(2, Math.min(98, simulatedScore))) + '%' }">
+                                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <div>
+                                                                <div class="font-bold text-slate-500 mb-1">指標權重 (Weights)</div>
+                                                                <ul class="list-disc pl-4 space-y-1 text-[11px] font-medium">
+                                                                    <li>CNN 恐懼貪婪指數 <span class="font-bold text-slate-600">(30%)</span></li>
+                                                                    <li>VIX 恐慌指數 <span class="font-bold text-slate-600">(25%)</span></li>
+                                                                    <li>QQQ 乖離率 <span class="font-bold text-slate-600">(25%)</span></li>
+                                                                    <li>DXY 美元指數 <span class="font-bold text-slate-600">(20%)</span></li>
+                                                                </ul>
                                                             </div>
-                                                            <div class="bg-rose-500 transition-all duration-300"
-                                                                :style="{ width: Math.max(2, Math.min(98, simulatedScore)) + '%' }">
+                                                            <div>
+                                                                <div class="font-bold text-slate-500 mb-1">情緒判定 (Sentiment Logic)</div>
+                                                                <ul class="space-y-1 text-[11px] font-medium">
+                                                                    <li><span class="text-rose-500 font-bold">≥ 90</span> 極度狂熱 (危險)</li>
+                                                                    <li><span class="text-amber-500 font-bold">80-89</span> 偏熱安逸 (留意風險)</li>
+                                                                    <li><span class="text-amber-400 font-bold">60-79</span> 溫和偏多</li>
+                                                                    <li><span class="text-slate-400 font-bold">41-59</span> 中立震盪</li>
+                                                                    <li><span class="text-emerald-400 font-bold">21-40</span> 市場冷卻 (低估區)</li>
+                                                                    <li><span class="text-emerald-500 font-bold">≤ 20</span> 恐慌超跌 (鑽石買點)</li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mt-3 pt-3 border-t border-slate-100">
+                                                            <div class="font-bold text-indigo-500 mb-1">⚠️ 智能情境強制覆寫 (US Smart Overrides)</div>
+                                                            <div class="text-[10px] font-medium text-slate-500 space-y-1">
+                                                                <p>• <strong class="text-rose-400">🚨 流動性風暴：</strong>強美元(>2) + 高實質利率(>2) + 高恐慌(>25) ➔ 強制觸發海嘯防禦(建議減碼30%)。</p>
+                                                                <p>• <strong class="text-amber-500">⚠️ 高檔風險背離：</strong>科技股過熱(>5) + 高恐慌(>25) ➔ 聰明錢撤退，強制建議套現。</p>
+                                                                <p>• <strong class="text-emerald-500">💎 恐慌錯殺：</strong>科技股暴跌(<-8) + 極恐慌(VIX>35, CNN<20) ➔ 觸發鑽石買點(建議加碼30%)。</p>
+                                                                <p>• <strong class="text-emerald-400">🚀 強勢軋空：</strong>科技股偏強(>0) + 弱美元(<-1) + 低恐慌(<18) ➔ 資金派對，建議觀望續抱。</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 text-xs leading-relaxed">
+                                                        <div class="font-black text-emerald-700 mb-2 border-b border-emerald-100 pb-2 flex items-center gap-2">
+                                                            <span class="text-base">🐳</span> 台股情緒模型 (TW Market Momentum)
+                                                        </div>
+                                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <div>
+                                                                <div class="font-bold text-slate-500 mb-1">指標權重 (Weights)</div>
+                                                                <ul class="list-disc pl-4 space-y-1 text-[11px] font-medium">
+                                                                    <li>三大法人買賣超 <span class="font-bold text-slate-600">(35%)</span></li>
+                                                                    <li>0050 成交量熱度 <span class="font-bold text-slate-600">(30%)</span></li>
+                                                                    <li>0050 均線乖離率 <span class="font-bold text-slate-600">(20%)</span></li>
+                                                                    <li>USD/TWD 匯率乖離 <span class="font-bold text-slate-600">(15%)</span></li>
+                                                                </ul>
+                                                            </div>
+                                                            <div>
+                                                                <div class="font-bold text-slate-500 mb-1">情緒判定 (Sentiment Logic)</div>
+                                                                <ul class="space-y-1 text-[11px] font-medium">
+                                                                    <li><span class="text-rose-500 font-bold">≥ 85</span> 全面過熱 (留意賣壓)</li>
+                                                                    <li><span class="text-amber-500 font-bold">75-84</span> 偏熱警戒 (法人動向)</li>
+                                                                    <li><span class="text-amber-400 font-bold">60-74</span> 資金偏熱</li>
+                                                                    <li><span class="text-slate-400 font-bold">46-59</span> 中立震盪 (若法人大賣則受壓制)</li>
+                                                                    <li><span class="text-emerald-400 font-bold">26-45</span> 偏冷修正 (承接機會)</li>
+                                                                    <li><span class="text-emerald-500 font-bold">≤ 25</span> 極度恐慌 (超跌買點)</li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mt-3 pt-3 border-t border-slate-100">
+                                                            <div class="font-bold text-rose-500 mb-1">⚠️ 智能情境強制覆寫 (Smart Overrides)</div>
+                                                            <div class="text-[10px] font-medium text-slate-500 space-y-1">
+                                                                <p>• <strong class="text-rose-400">高檔無量下跌：</strong>正乖離過大 + 法人出逃 + 量縮 ➔ 強制判定極危險 (分數 95)。</p>
+                                                                <p>• <strong class="text-rose-400">高檔籌碼潰散：</strong>正乖離過大 + 法人出逃 + 爆量 ➔ 強制嚴格減碼 (分數 90)。</p>
+                                                                <p>• <strong class="text-emerald-500">極度恐慌超跌：</strong>嚴重負乖離 + 爆量換手 ➔ 強制判定買點 (分數 15)。</p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -3848,24 +3752,109 @@
                                         const qqqBias = this.indices.qqqBias || 0;
                                         const dxyBias = this.indices.dxyBias || 0;
 
+                                        const tipsVal = this.indices.realRate || 1.8;
+
                                         const scoreVix = minMaxScale(vixVal, 50.0, 10.0, false);
                                         const scoreCnn = minMaxScale(cnnVal, 0.0, 100.0, false);
                                         const scoreQQQ = minMaxScale(qqqBias, -8.0, 12.0, false);
                                         const scoreDxy = minMaxScale(dxyBias, -3.0, 3.0, true);
 
                                         const weightedScore = (scoreQQQ * 0.25) + (scoreDxy * 0.20) + (scoreCnn * 0.30) + (scoreVix * 0.25);
-                                        const total = Math.round(weightedScore);
+                                        let total = Math.round(weightedScore);
 
                                         let status = '中立震盪';
                                         let colorClass = 'text-slate-400 bg-slate-400/10 border-slate-400/20';
+                                        let overrides = null;
 
-                                        if (total >= 90) { status = '極度狂熱 (危險)'; colorClass = 'text-rose-400 bg-rose-400/10 border-rose-400/20'; }
-                                        else if (total >= 80) { status = '偏熱安逸 (留意風險)'; colorClass = 'text-amber-500 bg-amber-400/10 border-amber-400/20'; }
-                                        else if (total >= 60) { status = '溫和偏多'; colorClass = 'text-amber-400 bg-amber-300/10 border-amber-300/20'; }
-                                        else if (total <= 20) { status = '恐慌超跌 (鑽石買點)'; colorClass = 'text-emerald-500 bg-emerald-400/10 border-emerald-400/20 shadow-[0_0_8px_rgba(16,185,129,0.5)]'; }
-                                        else if (total <= 40) { status = '市場冷卻 (低估區)'; colorClass = 'text-emerald-400 bg-emerald-300/10 border-emerald-300/20'; }
+                                        if (dxyBias > 2.0 && tipsVal > 2.0 && vixVal > 25) {
+                                            total = 95;
+                                            status = '海嘯防禦 (流動性風暴)';
+                                            colorClass = 'text-rose-500 bg-rose-400/10 border-rose-400/20';
+                                            overrides = { trend: '🚨 流動性風暴', action: '強制減碼 30%' };
+                                        } else if (qqqBias > 5.0 && vixVal > 25) {
+                                            total = 90;
+                                            status = '套現避險 (高檔風險背離)';
+                                            colorClass = 'text-rose-400 bg-rose-400/10 border-rose-400/20';
+                                            overrides = { trend: '⚠️ 高檔風險背離', action: '減碼 20% 套現' };
+                                        } else if (qqqBias < -8.0 && vixVal > 35 && cnnVal < 20) {
+                                            total = 15;
+                                            status = '恐慌錯殺 (鑽石買點)';
+                                            colorClass = 'text-emerald-500 bg-emerald-400/10 border-emerald-400/20';
+                                            overrides = { trend: '💎 恐慌錯殺', action: '加碼 30% All-in' };
+                                        } else if (qqqBias > 0 && dxyBias < -1.0 && vixVal < 18) {
+                                            status = '強勢軋空 (觀望續抱)';
+                                            colorClass = 'text-emerald-400 bg-emerald-300/10 border-emerald-300/20';
+                                            overrides = { trend: '🚀 強勢軋空', action: '觀望續抱' };
+                                        } else {
+                                            if (total >= 90) { status = '極度狂熱 (危險)'; colorClass = 'text-rose-400 bg-rose-400/10 border-rose-400/20'; }
+                                            else if (total >= 80) { status = '偏熱安逸 (留意風險)'; colorClass = 'text-amber-500 bg-amber-400/10 border-amber-400/20'; }
+                                            else if (total >= 60) { status = '溫和偏多'; colorClass = 'text-amber-400 bg-amber-300/10 border-amber-300/20'; }
+                                            else if (total <= 20) { status = '恐慌超跌 (鑽石買點)'; colorClass = 'text-emerald-500 bg-emerald-400/10 border-emerald-400/20'; }
+                                            else if (total <= 40) { status = '市場冷卻 (低估區)'; colorClass = 'text-emerald-400 bg-emerald-300/10 border-emerald-300/20'; }
+                                        }
 
-                                        return { total, status, colorClass, details: { vix: scoreVix, cnn: scoreCnn, qqq: scoreQQQ, dxy: scoreDxy } };
+                                        return { total, status, colorClass, overrides, details: { vix: scoreVix, cnn: scoreCnn, qqq: scoreQQQ, dxy: scoreDxy } };
+                                    },
+                                    aiUsInsight() {
+                                        const vixVal = this.indices.vix || 20;
+                                        const cnnVal = this.indices.cnn || 50;
+                                        const qqqBias = this.indices.qqqBias || 0;
+                                        const dxyBias = this.indices.dxyBias || 0;
+                                        const tipsVal = this.indices.realRate || 1.8;
+
+                                        if (dxyBias > 2.0 && tipsVal > 2.0 && vixVal > 25) {
+                                            return {
+                                                emoji: '風暴', title: '流動性風暴',
+                                                future: '強美元與高實質利率正在快速抽乾市場流動性，伴隨高恐慌情緒，極易引發無差別拋售的多殺多海嘯。',
+                                                action: '強制建議減碼至少 30% 股票資產，轉入現金或短天期美債避險，等待風暴平息。',
+                                                iconTheme: 'bg-white text-rose-500 border-rose-200 shadow-sm'
+                                            };
+                                        } else if (qqqBias > 5.0 && vixVal > 25) {
+                                            return {
+                                                emoji: '背離', title: '高檔風險背離 (聰明錢撤退)',
+                                                future: '科技股股價仍在相對高檔，但 VIX 恐慌指數已率先異常攀升，顯示避險資金或聰明錢正在悄悄撤出。',
+                                                action: '逢高分批套現，建議減碼 20% 獲利部位，嚴控追高風險。',
+                                                iconTheme: 'bg-white text-amber-500 border-amber-200 shadow-sm'
+                                            };
+                                        } else if (qqqBias < -8.0 && vixVal > 35 && cnnVal < 20) {
+                                            return {
+                                                emoji: '錯殺', title: '恐慌錯殺 (鑽石底)',
+                                                future: '市場陷入非理性極度恐慌，科技股短線乖離過大。歷史經驗顯示，這往往是絕佳的波段起漲買點。',
+                                                action: '勇敢進場！建議加碼 30% 承接跌深的優質科技股或大盤 ETF。',
+                                                iconTheme: 'bg-white text-emerald-500 border-emerald-200 shadow-sm'
+                                            };
+                                        } else if (qqqBias > 0 && dxyBias < -1.0 && vixVal < 18) {
+                                            return {
+                                                emoji: '軋空', title: '強勢軋空 (資金派對)',
+                                                future: '弱勢美元釋放流動性，加上市場情緒穩定，資金派對正在推升科技股進行軋空行情。',
+                                                action: '維持做多部位，觀望續抱，讓獲利奔跑，但可適度上移停利點。',
+                                                iconTheme: 'bg-white text-emerald-400 border-emerald-200 shadow-sm'
+                                            };
+                                        }
+                                        
+                                        const score = this.momentumScore.total;
+                                        if (score >= 80) {
+                                            return {
+                                                emoji: '過熱', title: '偏熱安逸',
+                                                future: '市場情緒極度樂觀，資金動能強勁，但隨時可能面臨漲多回檔的獲利了結賣壓。',
+                                                action: '不宜過度追高，持有核心部位，適度調節邊緣弱勢股。',
+                                                iconTheme: 'bg-white text-rose-400 border-rose-200 shadow-sm'
+                                            };
+                                        } else if (score <= 40) {
+                                            return {
+                                                emoji: '冷卻', title: '市場冷卻',
+                                                future: '投資人情緒低迷，股價處於偏低估值區域，長期投資的潛在回報率逐漸上升。',
+                                                action: '可開始運用閒餘資金，分批往下建立長期部位。',
+                                                iconTheme: 'bg-white text-emerald-500 border-emerald-200 shadow-sm'
+                                            };
+                                        } else {
+                                            return {
+                                                emoji: '震盪', title: '中立震盪',
+                                                future: '目前多空力量均衡，無明顯單邊趨勢，大盤將以區間震盪整理為主。',
+                                                action: '耐心等待更明確的方向信號，或透過區間來回操作降低成本。',
+                                                iconTheme: 'bg-white text-[#8a817c] border-[#e5e0d8] shadow-sm'
+                                            };
+                                        }
                                     },
                                     aiTaiwanInsight() {
                                         const b = this.manualBias !== null ? this.manualBias : parseFloat(this.biasIndex || 0);
@@ -3878,45 +3867,35 @@
                                                 emoji: '出貨', title: '高檔量價背離',
                                                 future: '散戶追價意願不足，主力可能在相對高檔利用量縮慢慢出貨。未來 1-2 週極易出現急跌修正。',
                                                 action: '停止追高，手中獲利部位應啟動移動停利機制。',
-                                                theme: 'bg-white border-stone-200 text-stone-800',
-                                                iconTheme: 'bg-stone-50 text-stone-600 border-stone-200',
-                                                pulse: false
+                                                iconTheme: 'bg-white text-rose-400 border-rose-200 shadow-sm'
                                             };
                                         } else if (usdTwdB > 1.0 && instTotal < -150 && b > -5) {
                                             return {
                                                 emoji: '提款', title: '外資熱錢提款',
                                                 future: '外資資金匯出，台股失去資金活水，權值股將面臨沉重提款壓力，大盤易跌難漲。',
                                                 action: '嚴格控管資金水位，可適度買入反向 ETF 或增加避險部位。',
-                                                theme: 'bg-white border-stone-200 text-stone-800',
-                                                iconTheme: 'bg-stone-50 text-stone-600 border-stone-200',
-                                                pulse: false
+                                                iconTheme: 'bg-white text-rose-500 border-rose-200 shadow-sm'
                                             };
                                         } else if (b < -8.0 && volumeRatio > 150.0) {
                                             return {
                                                 emoji: '換手', title: '恐慌趕底與爆量換手',
                                                 future: '多殺多斷頭潮湧現，同時有大戶進場掃貨。歷史經驗顯示此處為波段起漲點機率極高。',
                                                 action: '不要在此刻停損殺低。分批往下承接優質權值股或大盤 ETF。',
-                                                theme: 'bg-white border-stone-200 text-stone-800',
-                                                iconTheme: 'bg-stone-50 text-stone-600 border-stone-200',
-                                                pulse: false
+                                                iconTheme: 'bg-white text-[#8b9d83] border-[#8b9d83]/30 shadow-sm'
                                             };
                                         } else if (usdTwdB < -1.0 && instTotal > 150 && volumeRatio > 120.0) {
                                             return {
                                                 emoji: '軋空', title: '軋空主升段',
                                                 future: '熱錢大舉湧入，外資回補，大盤將出現強勢軋空行情。',
                                                 action: '順勢操作，緊抱多單，適度放大獲利。',
-                                                theme: 'bg-white border-stone-200 text-stone-800',
-                                                iconTheme: 'bg-stone-50 text-stone-600 border-stone-200',
-                                                pulse: false
+                                                iconTheme: 'bg-white text-[#8b9d83] border-[#8b9d83]/30 shadow-sm'
                                             };
                                         } else {
                                             return {
                                                 emoji: '震盪', title: '常態震盪整理',
                                                 future: '大盤處於區間震盪整理，資金輪動快速，個股表現將分歧。',
                                                 action: '控制部位，高出低進，以基本面選股為主，不宜過度追高殺低。',
-                                                theme: 'bg-white border-stone-200 text-stone-800',
-                                                iconTheme: 'bg-stone-50 text-stone-600 border-stone-200',
-                                                pulse: false
+                                                iconTheme: 'bg-white text-[#8a817c] border-[#e5e0d8] shadow-sm'
                                             };
                                         }
                                     },
@@ -3988,10 +3967,11 @@
                                         const score = this.activeMarketScore.total;
                                         const macroRisk = this.macroRiskLevel.total;
 
-                                        const isBull = score <= 40;
-                                        const isStrong = score <= 20;
-                                        const isBear = score >= 75;
-                                        const isRaging = score >= 90;
+                                        const isTw = this.currentView === 'tw_market';
+                                        const isBull = score <= (isTw ? 45 : 40);
+                                        const isStrong = score <= (isTw ? 25 : 20);
+                                        const isBear = score >= (isTw ? 75 : 80);
+                                        const isRaging = score >= (isTw ? 85 : 90);
 
                                         const bearPct = Math.max(2, Math.min(98, score));
                                         const bullPct = 100 - bearPct;
@@ -4071,7 +4051,7 @@
                                         const qqqBias = this.indices.qqqBias || 0;
                                         const dxyBias = this.indices.dxyBias || 0;
                                         const vixVal = this.indices.vix || 20;
-                                        const tipsVal = this.indices.tips || 1.8;
+                                        const tipsVal = this.indices.realRate || 1.8;
                                         const cnnVal = this.indices.cnn || 50;
 
                                         let macroOverrideMsg = "";
@@ -4344,6 +4324,28 @@
                                             throw new Error(`All fetch attempts failed: ${targetUrl}`);
                                         }
                                     },
+                                    async fetchCnn() {
+                                        try {
+                                            const targetUrl = 'https://production.dataviz.cnn.io/index/fearandgreed/graphdata';
+                                            const encodedUrl = encodeURIComponent(targetUrl);
+                                            // 嘗試透過代理抓取
+                                            const proxyUrl = `https://corsproxy.io/?${encodedUrl}`;
+                                            const res = await fetch(proxyUrl, {
+                                                headers: {
+                                                    'Accept': 'application/json',
+                                                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+                                                }
+                                            });
+                                            if (!res.ok) throw new Error('CNN API blocked');
+                                            
+                                            const json = await res.json();
+                                            if (json && json.fear_and_greed && typeof json.fear_and_greed.score === 'number') {
+                                                this.indices.cnn = Math.round(json.fear_and_greed.score);
+                                            }
+                                        } catch (e) {
+                                            console.warn('自動更新恐懼貪婪指數失敗 (因 CNN 防爬蟲阻擋)，需手動更新:', e);
+                                        }
+                                    },
                                     async fetchVix() {
                                         this.vixLoading = true;
                                         try {
@@ -4575,6 +4577,7 @@
 
                                         await Promise.allSettled([
                                             this.fetchVix(),
+                                            this.fetchCnn(),
                                             this.fetchDualMABias('0050.TW', 'bias0050', 'bias0050_20'),
                                             this.fetch0050VolumeHeat(),
                                             this.fetchDualMABias('TWD=X', 'usdtwdBias'),
