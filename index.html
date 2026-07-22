@@ -1757,8 +1757,7 @@
                                                     <div class="flex justify-between items-center">
                                                         <span class="text-xs font-bold text-[#8a817c]">證券成本</span>
                                                         <input :value="currentSecuritiesCost"
-                                                            :disabled="selectedTraders.includes('所有') || selectedTraders.length !== 1 || selectedTraders[0] === '本人'"
-                                                            @input="e => { const t = (selectedTraders.length === 1 && !selectedTraders.includes('所有')) ? selectedTraders[0] : '所有'; if (!reconcileForm[t]) reconcileForm[t] = {}; reconcileForm[t].securitiesCost = parseFloat(e.target.value) || 0; saveReconcileData(); }"
+                                                            disabled
                                                             type="number"
                                                             class="w-24 text-right bg-[#faf9f5] border border-[#e5e0d8] rounded px-2 py-1 text-xs font-black text-[#5c544d] outline-none focus:border-rose-400 transition-colors disabled:bg-[#f0ebe1] disabled:text-[#a89f91]"
                                                             placeholder="證券成本">
@@ -1821,6 +1820,11 @@
                                                             </select>
                                                         </div>
                                                         <div class="flex items-center gap-2">
+                                                            <select v-model="quickInput.deposit.currency"
+                                                                class="bg-[#faf9f5] border border-[#e5e0d8] text-xs font-bold text-[#8a817c] rounded px-1 outline-none py-1">
+                                                                <option value="TWD">TWD</option>
+                                                                <option value="USD">USD</option>
+                                                            </select>
                                                             <input v-model.number="quickInput.deposit.amount"
                                                                 type="number" placeholder="金額"
                                                                 class="flex-1 bg-[#faf9f5] px-2 py-1 rounded border border-[#e5e0d8] text-sm font-black text-[#8b9d83] outline-none focus:border-emerald-400 min-w-0">
@@ -3375,21 +3379,25 @@
                                                                     }}</span>
                                                             </div>
                                                         </td>
-                                                        <td
-                                                            class="py-4 px-4 text-right text-[#8a817c] mono pr-4 text-sm font-medium">
-                                                            {{ (traderSecuritiesCosts[t]?.buyPaid ||
-                                                            0).toLocaleString() }}
-                                                            <span
-                                                                class="text-[9px] text-[#8b9d83] bg-[#f4f5f1] px-1.5 py-0.5 rounded block font-black mt-1 w-fit ml-auto">⚡
-                                                                自動推算</span>
+                                                        <td class="py-4 px-4 text-right">
+                                                            <div class="relative inline-block">
+                                                                <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[#a89f91] font-bold text-xs">$</span>
+                                                                <input :value="(reconcileForm[t] || {}).originalBuy"
+                                                                    @input="e => { if (!reconcileForm[t]) reconcileForm[t] = {}; reconcileForm[t].originalBuy = e.target.value === '' ? '' : (parseFloat(e.target.value) || 0); saveReconcileData(); }"
+                                                                    type="number"
+                                                                    class="w-32 text-right bg-[#faf9f5] border border-[#e5e0d8] rounded-lg pl-6 pr-3 py-1.5 text-sm font-black text-[#5c544d] outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all shadow-sm"
+                                                                    placeholder="0">
+                                                            </div>
                                                         </td>
-                                                        <td
-                                                            class="py-4 px-4 text-right text-[#8a817c] mono pr-4 text-sm font-medium">
-                                                            {{ (traderSecuritiesCosts[t]?.sellReceived ||
-                                                            0).toLocaleString() }}
-                                                            <span
-                                                                class="text-[9px] text-[#c38d8d] bg-[#f8f1f1] px-1.5 py-0.5 rounded block font-black mt-1 w-fit ml-auto">⚡
-                                                                自動推算</span>
+                                                        <td class="py-4 px-4 text-right">
+                                                            <div class="relative inline-block">
+                                                                <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[#a89f91] font-bold text-xs">$</span>
+                                                                <input :value="(reconcileForm[t] || {}).originalSell"
+                                                                    @input="e => { if (!reconcileForm[t]) reconcileForm[t] = {}; reconcileForm[t].originalSell = e.target.value === '' ? '' : (parseFloat(e.target.value) || 0); saveReconcileData(); }"
+                                                                    type="number"
+                                                                    class="w-32 text-right bg-[#faf9f5] border border-[#e5e0d8] rounded-lg pl-6 pr-3 py-1.5 text-sm font-black text-[#5c544d] outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all shadow-sm"
+                                                                    placeholder="0">
+                                                            </div>
                                                         </td>
                                                         <td
                                                             class="py-4 px-4 text-right mono text-[#5c544d] text-sm bg-[#f0ebe1]/50 font-black">
@@ -3563,7 +3571,7 @@
                                         stocks: safeStocks,
                                         depositLogs: safeLogs,
                                         quickInput: {
-                                            deposit: { type: 'deposit', amount: null, date: DateTime.now().toFormat('yyyy-MM-dd'), note: '', owner: '本人' },
+                                            deposit: { type: 'deposit', amount: null, date: DateTime.now().toFormat('yyyy-MM-dd'), note: '', owner: '本人', currency: 'TWD' },
                                             sell: { amount: null, date: DateTime.now().toFormat('yyyy-MM-dd'), note: '', owner: '本人', profit: null },
                                             dividend: { amount: null, date: DateTime.now().toFormat('yyyy-MM-dd'), note: '', owner: '本人' }
                                         },
@@ -3763,17 +3771,14 @@
 
                                         const formAll = this.reconcileForm['所有'] || {};
 
-                                        // 統計其他成員 (媽媽、瑄等) 的自動買進 (出入金明細) 與自動賣出 (賣出明細)
+                                        // 統計其他成員 (媽媽、瑄等) 的買進與賣出 (改為手動輸入為主)
                                         let otherMembersBuyPaid = 0;
                                         let otherMembersSellReceived = 0;
                                         this.traders.forEach(t => {
                                             if (t !== '所有' && t !== '本人') {
-                                                const memberLogs = this.depositLogs.filter(d => (d.owner || '本人') === t);
-                                                const memberDeposits = memberLogs.filter(l => !l.type || l.type === 'deposit' || l.type === 'adjustment').reduce((sum, l) => sum + l.amount, 0);
-                                                costs[t].buyPaid = memberDeposits;
-
-                                                const memberSells = memberLogs.filter(l => l.type === 'sell').reduce((sum, l) => sum + l.amount, 0);
-                                                costs[t].sellReceived = memberSells;
+                                                const formT = this.reconcileForm[t] || {};
+                                                costs[t].buyPaid = (formT.originalBuy !== undefined && formT.originalBuy !== '') ? Number(formT.originalBuy) : 0;
+                                                costs[t].sellReceived = (formT.originalSell !== undefined && formT.originalSell !== '') ? Number(formT.originalSell) : 0;
 
                                                 costs[t].netCost = costs[t].buyPaid - costs[t].sellReceived;
 
@@ -3792,9 +3797,12 @@
                                         costs['本人'].sellReceived = costs['所有'].sellReceived - otherMembersSellReceived;
                                         costs['本人'].netCost = costs['本人'].buyPaid - costs['本人'].sellReceived;
 
-                                        // 同步舊欄位以相容於其他介面的調用 (把所有人與本人的 netCost 同步給 reconcileForm 的舊變數)
-                                        if (this.reconcileForm['所有']) this.reconcileForm['所有'].securitiesCost = costs['所有'].netCost;
-                                        if (this.reconcileForm['本人']) this.reconcileForm['本人'].securitiesCost = costs['本人'].netCost;
+                                        // 同步舊欄位以相容於其他介面的調用 (把所有成員的 netCost 同步給 reconcileForm 的舊變數)
+                                        Object.keys(costs).forEach(t => {
+                                            if (this.reconcileForm[t]) {
+                                                this.reconcileForm[t].securitiesCost = costs[t].netCost;
+                                            }
+                                        });
 
                                         return costs;
                                     },
@@ -5219,10 +5227,18 @@ ${actionType} ${stock.name}
                                         const input = isQuickDeposit ? this.quickInput.deposit : this.quickInput[type];
                                         if (!input.amount || input.amount <= 0) return alert('請輸入有效金額');
 
+                                        let finalAmount = input.amount;
+                                        let finalNote = input.note;
+
+                                        if (isQuickDeposit && input.currency === 'USD') {
+                                            finalAmount = Math.round(input.amount * this.usdtwdRate);
+                                            finalNote = `[USD ${input.amount}] ` + (input.note || '');
+                                        }
+
                                         const logEntry = {
                                             date: input.date,
-                                            amount: input.amount,
-                                            note: input.note,
+                                            amount: finalAmount,
+                                            note: finalNote,
                                             type: type,
                                             owner: input.owner || '本人'
                                         };
@@ -5889,33 +5905,14 @@ ${actionType} ${stock.name}
                                         console.log('強制初始化本人現金為 0 成功！');
                                     }
 
-                                    // Migration: rebuild reconcileForm[member].bankCash from depositLogs
-                                    // This handles data entered in older app versions
-                                    let migrated = false;
+                                    // Migration: 保持手動編輯，不再自動覆蓋 bankCash
                                     this.traders.forEach(t => {
                                         if (t !== '所有' && t !== '本人') {
-                                            const memberLogs = this.depositLogs.filter(d => (d.owner || '本人') === t);
-                                            if (memberLogs.length === 0) return;
-
-                                            // 賣出、配息才算現金收入；入金是買股票用的不算現有現金；出金扣除
-                                            const computed = memberLogs.reduce((sum, l) => {
-                                                if (l.type === 'sell' || l.type === 'dividend') return sum + l.amount;
-                                                if (l.type === 'withdraw') return sum - l.amount;
-                                                // type === 'deposit' → 用來買股票的，不算現金
-                                                return sum;
-                                            }, 0);
-
                                             if (!this.reconcileForm[t]) {
-                                                this.reconcileForm[t] = { securitiesCost: 0, bankCash: computed };
-                                                migrated = true;
-                                            } else if (this.reconcileForm[t].bankCash <= 0 && computed > 0) {
-                                                // 若目前是負數或零，但從賣出紀錄計算出正值，以計算值修正
-                                                this.reconcileForm[t].bankCash = computed;
-                                                migrated = true;
+                                                this.reconcileForm[t] = { securitiesCost: 0, bankCash: 0 };
                                             }
                                         }
                                     });
-                                    if (migrated) this.saveReconcileData();
 
                                     // 強制將歷史所有交易的「扣款 (syncCash)」設為開啟，以配合新的對帳演算法
                                     if (localStorage.getItem('f_force_all_sync_cash_true') !== 'true') {
